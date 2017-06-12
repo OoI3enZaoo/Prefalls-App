@@ -1,0 +1,145 @@
+package SQLite;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+/**
+ * Created by Ben on 11/6/2560.
+ */
+
+public class DBPetient extends SQLiteOpenHelper {
+
+    public static final String DATABASE_NAME = "Petient.db";
+    public static final String CONTACTS_TABLE_NAME = "petient_list";
+    public static final String CONTACTS_COLUMN_SSSN = "SSSN";
+    public static final String CONTACTS_COLUMN_firstname = "firstname";
+    public static final String CONTACTS_COLUMN_lastname = "lastname";
+    public static final String CONTACTS_COLUMN_nickname = "nickname";
+    public static final String CONTACTS_COLUMN_sex = "sex";
+    public static final String CONTACTS_COLUMN_birthday = "birthday";
+    public static final String CONTACTS_COLUMN_address = "address";
+    public static final String CONTACTS_COLUMN_imgPath = "imgPath";
+    public static final String CONTACTS_COLUMN_weight = "weight";
+    public static final String CONTACTS_COLUMN_height = "height";
+    public static final String CONTACTS_COLUMN_apparent = "apparent";
+    public static final String CONTACTS_COLUMN_diseases = "diseases";
+    public static final String CONTACTS_COLUMN_medicine = "medicine";
+    public static final String CONTACTS_COLUMN_AllergicMed = "AllergicMed";
+    public static final String CONTACTS_COLUMN_AllergicFood = "AllergicFood";
+    public static final String CONTACTS_COLUMN_doctorName = "doctorName";
+    public static final String CONTACTS_COLUMN_doctorPhone = "doctorPhone";
+    public static final String CONTACTS_COLUMN_hospitalName = "hospitalName";
+    public static final String CONTACTS_COLUMN_cousinName1 = "cousinName1";
+    public static final String CONTACTS_COLUMN_cousinPhone1 = "cousinPhone1";
+    public static final String CONTACTS_COLUMN_cousinRelation1 = "cousinRelation1";
+    public static final String CONTACTS_COLUMN_cousinName2 = "cousinName2";
+    public static final String CONTACTS_COLUMN_cousinPhone2 = "cousinPhone2";
+    public static final String CONTACTS_COLUMN_cousinRelation2 = "cousinRelation2";
+    public static final String CONTACTS_COLUMN_cousinName3 = "cousinName3";
+    public static final String CONTACTS_COLUMN_cousinPhone3 = "cousinPhone3";
+    public static final String CONTACTS_COLUMN_cousinRelation3 = "cousinRelation3";
+
+    public DBPetient(Context context) {
+        super(context, DATABASE_NAME, null, 1);
+    }
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        db.execSQL(
+                "create table " + CONTACTS_TABLE_NAME +
+                        "(" +
+                        CONTACTS_COLUMN_SSSN + " text," +
+                        CONTACTS_COLUMN_firstname + " text," +
+                        CONTACTS_COLUMN_lastname + " text," +
+                        CONTACTS_COLUMN_nickname + " text," +
+                        CONTACTS_COLUMN_sex + " text," +
+                        CONTACTS_COLUMN_birthday + " text," +
+                        CONTACTS_COLUMN_address + " text," +
+                        CONTACTS_COLUMN_imgPath + " text," +
+                        CONTACTS_COLUMN_weight + " text," +
+                        CONTACTS_COLUMN_height + " text," +
+                        CONTACTS_COLUMN_apparent + " text," +
+                        CONTACTS_COLUMN_diseases + " text," +
+                        CONTACTS_COLUMN_medicine + " text," +
+                        CONTACTS_COLUMN_AllergicMed + " text," +
+                        CONTACTS_COLUMN_AllergicFood + " text," +
+                        CONTACTS_COLUMN_doctorName + " text," +
+                        CONTACTS_COLUMN_doctorPhone + " text," +
+                        CONTACTS_COLUMN_hospitalName + " text," +
+                        CONTACTS_COLUMN_cousinName1 + " text," +
+                        CONTACTS_COLUMN_cousinPhone1 + " text," +
+                        CONTACTS_COLUMN_cousinRelation1 + " text," +
+                        CONTACTS_COLUMN_cousinName2 + " text," +
+                        CONTACTS_COLUMN_cousinPhone2 + " text," +
+                        CONTACTS_COLUMN_cousinRelation2 + " text," +
+                        CONTACTS_COLUMN_cousinName3 + " text," +
+                        CONTACTS_COLUMN_cousinPhone3 + " text," +
+                        CONTACTS_COLUMN_cousinRelation3 + " text " +
+                        ")"
+        );
+    }
+    public void drop() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(CONTACTS_TABLE_NAME, null, null);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // TODO Auto-generated method stub
+        db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_TABLE_NAME);
+        onCreate(db);
+    }
+    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CONTACTS_COLUMN_SSSN, SSSN);
+        contentValues.put(CONTACTS_COLUMN_firstname, firstname);
+        contentValues.put(CONTACTS_COLUMN_lastname, lastname);
+        contentValues.put(CONTACTS_COLUMN_nickname, nickname);
+        contentValues.put(CONTACTS_COLUMN_sex, sex);
+        contentValues.put(CONTACTS_COLUMN_birthday, birthday);
+        contentValues.put(CONTACTS_COLUMN_address, address);
+        contentValues.put(CONTACTS_COLUMN_imgPath, imgPath);
+        contentValues.put(CONTACTS_COLUMN_weight, weight);
+        contentValues.put(CONTACTS_COLUMN_height, height);
+        contentValues.put(CONTACTS_COLUMN_apparent, apparent);
+        contentValues.put(CONTACTS_COLUMN_diseases, diseases);
+        contentValues.put(CONTACTS_COLUMN_medicine, medicine);
+        contentValues.put(CONTACTS_COLUMN_AllergicMed, AllergicMed);
+        contentValues.put(CONTACTS_COLUMN_AllergicFood, AllergicFood);
+        contentValues.put(CONTACTS_COLUMN_doctorName, doctorName);
+        contentValues.put(CONTACTS_COLUMN_doctorPhone, doctorPhone );
+        contentValues.put(CONTACTS_COLUMN_hospitalName, hospitalName);
+        contentValues.put(CONTACTS_COLUMN_cousinName1, cousinName1);
+        contentValues.put(CONTACTS_COLUMN_cousinPhone1, cousinPhone1);
+        contentValues.put(CONTACTS_COLUMN_cousinRelation1, cousinRelation1);
+        contentValues.put(CONTACTS_COLUMN_cousinName2, cousinName2);
+        contentValues.put(CONTACTS_COLUMN_cousinPhone2, cousinPhone2);
+        contentValues.put(CONTACTS_COLUMN_cousinRelation2, cousinRelation2);
+        contentValues.put(CONTACTS_COLUMN_cousinName3, cousinName3);
+        contentValues.put(CONTACTS_COLUMN_cousinPhone3, cousinPhone3);
+        contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);
+        db.insert(CONTACTS_TABLE_NAME,null,contentValues);
+        db.close();
+        return true;
+    }
+    public Cursor getAllData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME, null);
+        return res;
+        /*
+            how to use
+          Cursor res = dbGrid.getAllData();
+                if (res.getCount() == 0) {
+                    Log.i("griddata", "Nothing found");
+                } else {
+                    while (res.moveToNext()) {
+                        String sName = res.getString(0);
+                    }
+         */
+    }
+
+}

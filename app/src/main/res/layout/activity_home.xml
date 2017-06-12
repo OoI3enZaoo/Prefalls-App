@@ -6,4 +6,48 @@
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
+
+    <devlight.io.library.ntb.NavigationTabBar
+        android:id="@+id/navigateTabBar"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        app:ntb_animation_duration="400"
+        app:ntb_active_color="#fff"
+        app:ntb_inactive_color="#000"
+
+        app:ntb_titled="true"
+        app:ntb_scaled="true"
+        app:ntb_tinted="true"
+        app:ntb_title_mode="all"
+        app:ntb_badge_position="right"
+        app:ntb_badge_gravity="top"
+
+        app:ntb_badge_use_typeface="true"
+        app:ntb_swiped="true"
+        app:ntb_bg_color="@color/colorPrimary"
+        app:ntb_icon_size_fraction="0.5"
+        app:ntb_badge_size="10sp"
+        app:ntb_title_size="10sp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="0dp"
+        android:layout_marginLeft="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="0dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/navigateTabBar"
+        app:layout_constraintVertical_bias="1.0"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
 </android.support.constraint.ConstraintLayout>
