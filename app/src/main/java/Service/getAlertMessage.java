@@ -1,11 +1,15 @@
 package Service;
 import android.annotation.TargetApi;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
+import android.os.Vibrator;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import net.sf.xenqtt.client.AsyncClientListener;
@@ -20,7 +24,6 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
 import java.io.StringReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -34,9 +37,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import Activity.NotificationActivity;
 import Activity.PetientListActivity;
+import Activity.R;
 import DataResponse.AlertEvent;
-import DataResponse.PatientResponse;
+import SQLite.DBAlertType;
 import SQLite.DBPetient;
 
 /**
@@ -53,7 +58,8 @@ public class getAlertMessage extends Service {
     private String sssn = "admin";
     //private String topic = "RFG2D3T6ET_alert";
     private ArrayList<String> sssnArray = new ArrayList<>();
-
+    private int vibratePeriod = 800;
+    int countalert = 1;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -125,11 +131,15 @@ public class getAlertMessage extends Service {
                         Log.i(TAG,"get end: "+event.getEnd());
                         Log.i(TAG,"get pid: "+event.getPid());
                         Log.i(TAG,"get type: " + event.getType());
-                        Intent broadcastIntent = new Intent();
-                        broadcastIntent.setAction(PetientListActivity.mBroadcastStringAction);
-                        broadcastIntent.putExtra("pid", pid);
-                        broadcastIntent.putExtra("type", type);
-                        sendBroadcast(broadcastIntent);
+                        //notification
+
+                        if(type == 3 || type == 4 || type == 7 || type == 8 || type ==9){
+                            Notification(pid,type);
+                            SendBrodcast(pid,type);
+                        }
+
+
+
 
                         message.ack();
                     }
@@ -238,5 +248,62 @@ public class getAlertMessage extends Service {
 
         return event;
     }
+    public void Notification(String pid , int type){
 
+        DBPetient dbpetient = new DBPetient(getApplicationContext());
+        String fullname = dbpetient.getFullName(pid);
+            Log.i(TAG,"TYPE: " + type);
+        DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
+        String typename = dbAlertType.getAlertType(type);
+        String message = fullname + " " + typename;
+        String title = "Prefalls Notification";
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.ic_alert)
+                .setTicker(title)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+        .setStyle(new NotificationCompat.BigTextStyle().bigText(title))
+        .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+
+
+        Intent resultIntent = new Intent(this, PetientListActivity.class);
+        resultIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,resultIntent, 0);
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        int mId =1;
+        mId++;
+        mNotificationManager.notify(mId, mBuilder.build());
+        //xxxxx add vibration xxxxx
+        Vibrator v2 = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        v2.vibrate(vibratePeriod);
+
+    }
+    public void SendBrodcast(String pid , int type){
+        DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
+        String typename = dbAlertType.getAlertType(type);
+        DBPetient dbpetient = new DBPetient(getApplicationContext());
+        String fullname = dbpetient.getFullName(pid);
+        String imagepath = dbpetient.getImagepath(pid);
+
+        //--send broadcast
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(PetientListActivity.mBroadcastStringAction);
+        broadcastIntent.putExtra("pid", pid);
+        broadcastIntent.putExtra("typename", typename);
+        sendBroadcast(broadcastIntent);
+
+
+
+        Intent broadcastIntent2 = new Intent();
+        broadcastIntent2.setAction(NotificationActivity.mBroadcastStringAction);
+        broadcastIntent2.putExtra("pid", pid);
+        broadcastIntent2.putExtra("typename", typename);
+        broadcastIntent2.putExtra("fullname", fullname);
+        broadcastIntent2.putExtra("imagepath", imagepath);
+        sendBroadcast(broadcastIntent2);
+
+    }
 }
