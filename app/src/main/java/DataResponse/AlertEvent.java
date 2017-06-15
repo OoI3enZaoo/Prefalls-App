@@ -9,7 +9,10 @@ public class AlertEvent {
     int type;
     Long start;
     Long end;
+    String lat;
+    String lng;
 
+//object ที่รับค่าหลังจากถูกแปลงจาก xml
     public void setPid(String pid) {
         this.pid = pid;
     }
@@ -36,5 +39,16 @@ public class AlertEvent {
     public Long getEnd(){
         return end;
     }
-
+    public void setLat(String lat){
+        this.lat = lat;
+    }
+    public String getLat(){
+        return lat;
+    }
+    public void setLng(String lng){
+        this.lng = lng;
+    }
+    public String getLng(){
+        return lng;
+    }
 }

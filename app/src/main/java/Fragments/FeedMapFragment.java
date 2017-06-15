@@ -2,18 +2,23 @@ package Fragments;
 
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -41,6 +46,7 @@ import Activity.PetientListActivity;
 import Activity.R;
 import DataResponse.LatLongResponse;
 import DataResponse.MemberResponse;
+import SQLite.DBPetient;
 import SQLite.DBUser;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -58,8 +64,11 @@ public class FeedMapFragment extends Fragment {
     public static Double mLat;
     public static Double mLong;
     public static String mTstamp;
+    public static String stab;
+    public static String sym;
+    public static String spd;
     public String TAG = "FeedMapFragment";
-    private ProgressDialog dialog;
+
     public FeedMapFragment() {
         // Required empty public constructor
     }
@@ -69,9 +78,7 @@ public class FeedMapFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed_map, container, false);
-        dialog = new ProgressDialog(getActivity());
 
-        startDialog();
 // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
@@ -85,7 +92,7 @@ public class FeedMapFragment extends Fragment {
         MapsInitializer.initialize(this.getActivity());
 
 
-        Log.i(TAG,"PID: " +PID);
+        Log.i(TAG, "PID: " + PID);
         new LatLongTask().execute(PID);
 
         return v;
@@ -108,20 +115,9 @@ public class FeedMapFragment extends Fragment {
         super.onLowMemory();
         mapView.onLowMemory();
     }
-    public void startDialog() {
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setMessage("Loading. Please wait...");
-        dialog.setIndeterminate(true);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
 
-    }
 
-    public void stopDialog() {
-        dialog.dismiss();
-    }
-
-    private class LatLongTask  extends AsyncTask<String,Void,String>{
+    private class LatLongTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... params) {
             String pid = params[0];
@@ -137,40 +133,88 @@ public class FeedMapFragment extends Fragment {
             try {
                 Response response = client.newCall(request).execute();
                 String result = response.body().string();
-                Log.i(TAG, "S: " + result);
-                Gson gson = new Gson();
-                Type collectionType = new TypeToken<Collection<LatLongResponse>>() {
-                }.getType();
-                Collection<LatLongResponse> enums = gson.fromJson(result, collectionType);
-                LatLongResponse[] result1 = enums.toArray(new LatLongResponse[enums.size()]);
+                Log.i(TAG, "S: " + result.trim());
+                if (!result.trim().equals("[]")) {
 
-                    Log.i(TAG,"Result1: " + result1);
+                    Gson gson = new Gson();
+                    Type collectionType = new TypeToken<Collection<LatLongResponse>>() {
+                    }.getType();
+                    Collection<LatLongResponse> enums = gson.fromJson(result, collectionType);
+                    LatLongResponse[] result1 = enums.toArray(new LatLongResponse[enums.size()]);
+
+                    Log.i(TAG, "Result1: " + result1);
                     mLat = Double.parseDouble(result1[0].getLat());
                     mLong = Double.parseDouble(result1[0].getLng());
-                     mTstamp = result1[0].getTstamp();
+                    mTstamp = result1[0].getTstamp();
+                    stab = result1[0].getStab();
+                    sym = result1[0].getSym();
+                    spd = result1[0].getSpd();
+                } else {
 
+                    return "0";
+                }
 
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return null;
+            return pid;
         }
 
         @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            Log.i(TAG, "S: " + result);
-            // Updates the location and zoom of the MapView
-            LatLng coordinates = new LatLng(mLat,mLong);
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 10);
-            map.animateCamera(cameraUpdate);
-            Marker marker = map.addMarker(new MarkerOptions()
-                    .position(coordinates)
-                    .title("San Francisco")
-                    .snippet("" + mTstamp));
-            stopDialog();
+        protected void onPostExecute(String pid) {
+            super.onPostExecute(pid);
+            if (!pid.equals("0")) {
+                DBPetient dbUser = new DBPetient(getActivity());
+                String sPName = "Patient Name: " + dbUser.getFullName(pid);
+                String sStab = "Stability index: " + stab + "\n";
+                String sSym = "Symmetry index: " + sym + "\n";
+                String sSpd = "avg speed: " + spd + " m/s";
+                String res = sStab + sSym + sSpd;
+                // Updates the location and zoom of the MapView
+                LatLng coordinates = new LatLng(mLat, mLong);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 17);
+                map.animateCamera(cameraUpdate);
+                map.addMarker(new MarkerOptions()
+                        .position(coordinates)
+                        .title(sPName)
+                        .snippet(res));
+                map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                    @Override
+                    public View getInfoWindow(Marker arg0) {
+                        return null;
+                    }
+
+                    @Override
+                    public View getInfoContents(Marker marker) {
+
+                        LinearLayout info = new LinearLayout(getActivity());
+                        info.setOrientation(LinearLayout.VERTICAL);
+
+                        TextView title = new TextView(getActivity());
+                        title.setTextColor(Color.BLACK);
+                        title.setGravity(Gravity.CENTER);
+                        title.setTypeface(null, Typeface.BOLD);
+                        title.setText(marker.getTitle());
+
+                        TextView snippet = new TextView(getActivity());
+                        snippet.setTextColor(Color.GRAY);
+                        snippet.setText(marker.getSnippet());
+
+                        info.addView(title);
+                        info.addView(snippet);
+
+                        return info;
+                    }
+                });
+
+            }else{
+                Toast.makeText(getActivity(), "Data Not Found", Toast.LENGTH_SHORT).show();
+
+            }
         }
     }
+
 }

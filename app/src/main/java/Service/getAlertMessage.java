@@ -1,4 +1,5 @@
 package Service;
+
 import android.annotation.TargetApi;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -6,11 +7,18 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import net.sf.xenqtt.client.AsyncClientListener;
 import net.sf.xenqtt.client.AsyncMqttClient;
@@ -23,7 +31,11 @@ import net.sf.xenqtt.message.QoS;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -37,12 +49,15 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import Activity.NotificationActivity;
 import Activity.PetientListActivity;
 import Activity.R;
 import DataResponse.AlertEvent;
+import SQLite.DBAlertAll;
+import SQLite.DBAlertEachOne;
 import SQLite.DBAlertType;
 import SQLite.DBPetient;
+
+import static DataResponse.CheckAlertColor.CheckAlertColor;
 
 /**
  * Created by Ben on 11/6/2560.
@@ -58,27 +73,26 @@ public class getAlertMessage extends Service {
     private String sssn = "admin";
     //private String topic = "RFG2D3T6ET_alert";
     private ArrayList<String> sssnArray = new ArrayList<>();
-    private int vibratePeriod = 800;
-    int countalert = 1;
+    private int vibratePeriod = 500;
+    public int countalert = 1;
+
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Log.i(TAG,"onCreate");
+        Log.i(TAG, "onCreate");
+        Toast.makeText(getApplicationContext(), "Start Service", Toast.LENGTH_SHORT).show();
         CreateTopic();
-
-
     }
 
     private void CreateTopic() {
-
-        Log.i(TAG,"CreateTopic");
+        Log.i(TAG, "CreateTopic");
         DBPetient dbPetient = new DBPetient(getApplication());
         Cursor res = dbPetient.getAllData();
-        Log.i(TAG,"res: " + res.getCount());
+        Log.i(TAG, "res: " + res.getCount());
         while (res.moveToNext()) {
-            String topic = res.getString(0)+"_alert";//sssn
-            Log.i(TAG,"Topic: " + topic);
+            String topic = res.getString(0) + "_alert";//sssn
+            Log.i(TAG, "Topic: " + topic);
             GetMqttThread mqttThread = createMQTTThread(sssn, topic);
             mqttThread.start();
             mqttThreadHT.put(sssn, mqttThread);
@@ -89,6 +103,7 @@ public class getAlertMessage extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
+
     @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
@@ -121,26 +136,22 @@ public class getAlertMessage extends Service {
                 mqttListener = new AsyncClientListener() {
                     @Override
                     public void publishReceived(MqttClient client, final PublishMessage message) {
-
+                        Log.i(TAG, "publishReceived: ");
                         final PublishMessage msg = message;
-
+                        Log.i(TAG, "Message: " + msg);
                         DataResponse.AlertEvent event = parseXML(msg.getPayloadString());
-                        String pid =  event.getPid();
+                        String pid = event.getPid();
                         int type = event.getType();
-                        Log.i(TAG,"get start: "+event.getStart());
-                        Log.i(TAG,"get end: "+event.getEnd());
-                        Log.i(TAG,"get pid: "+event.getPid());
-                        Log.i(TAG,"get type: " + event.getType());
+                        Log.i(TAG, "lat: " + event.getLat());
+                        Log.i(TAG, "lng: " + event.getLng());
+                        String lat = event.getLat();
+                        String lng = event.getLng();
                         //notification
 
-                        if(type == 3 || type == 4 || type == 7 || type == 8 || type ==9){
-                            Notification(pid,type);
-                            SendBrodcast(pid,type);
+                        if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9) {
+                            Notification(pid, type);
+                            SaveData(pid, type, String.valueOf(event.getStart()), lat, lng);
                         }
-
-
-
-
                         message.ack();
                     }
 
@@ -210,8 +221,9 @@ public class getAlertMessage extends Service {
         };//end new SetMqttThread
 
     }//end createMQTTThread()
+
     private AlertEvent parseXML(String xmlText) {
-        Log.i(TAG, "parseXML" );
+        Log.i(TAG, "parseXML");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         DocumentBuilder builder;
@@ -220,7 +232,7 @@ public class getAlertMessage extends Service {
         try {
             builder = factory.newDocumentBuilder();
             InputSource is = new InputSource(new StringReader(xmlText));
-            doc =  builder.parse(is);
+            doc = builder.parse(is);
 
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
@@ -239,71 +251,117 @@ public class getAlertMessage extends Service {
             expr = xpath.compile("/alert-event/@pid");
             String sssn = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
             event.setPid(sssn);
-
-
             expr = xpath.compile("/alert-event/@type");
             String alert_type = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
             event.setType(Integer.parseInt(alert_type));
-        } catch (Exception e) {System.out.println("Exception in parseXML:"+e);}
+            expr = xpath.compile("/alert-event/@lat");
+            String lat = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
+            event.setLat(lat);
+            expr = xpath.compile("/alert-event/@lon");
+            String lng = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
+            event.setLng(lng);
+        } catch (Exception e) {
+            System.out.println("Exception in parseXML:" + e);
+        }
 
         return event;
     }
-    public void Notification(String pid , int type){
 
+    public void Notification(String pid, int type) {
+
+        Log.i(TAG, "Notification()");
         DBPetient dbpetient = new DBPetient(getApplicationContext());
         String fullname = dbpetient.getFullName(pid);
-            Log.i(TAG,"TYPE: " + type);
+        String image = dbpetient.getImagepath(pid);
+        Log.i(TAG, "TYPE: " + type);
         DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
-        String typename = dbAlertType.getAlertType(type);
+        String typename = dbAlertType.getAlertTypeName(type);
         String message = fullname + " " + typename;
         String title = "Prefalls Notification";
+        
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_alert)
+                .setSmallIcon(R.mipmap.icon)
+                .setNumber(countalert)
                 .setTicker(title)
                 .setContentTitle(title)
                 .setContentText(message)
+                .setSound(alarmSound)
+                .setColor(Color.parseColor("#F44336"))
+
                 .setAutoCancel(true)
-        .setStyle(new NotificationCompat.BigTextStyle().bigText(title))
-        .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+                .setLargeIcon(getBitmapFromURL("http://sysnet.utcc.ac.th/prefalls/images/patients/" + image))
 
 
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(title))
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
+
+        countalert ++;
         Intent resultIntent = new Intent(this, PetientListActivity.class);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0,resultIntent, 0);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent, 0);
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        int mId =1;
-        mId++;
+        int mId = 1;
+        //mId++;
         mNotificationManager.notify(mId, mBuilder.build());
         //xxxxx add vibration xxxxx
         Vibrator v2 = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         v2.vibrate(vibratePeriod);
 
     }
-    public void SendBrodcast(String pid , int type){
+
+    public void SaveData(String pid, int type, String timestart, String lat, String lng) {
         DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
-        String typename = dbAlertType.getAlertType(type);
+        String typename = dbAlertType.getAlertTypeName(type);
         DBPetient dbpetient = new DBPetient(getApplicationContext());
         String fullname = dbpetient.getFullName(pid);
-        String imagepath = dbpetient.getImagepath(pid);
+
+        // String imagepath =dbpetient.getImagepath(pid);
 
         //--send broadcast
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(PetientListActivity.mBroadcastStringAction);
         broadcastIntent.putExtra("pid", pid);
+        broadcastIntent.putExtra("fullname", fullname);
+        broadcastIntent.putExtra("type", type);
         broadcastIntent.putExtra("typename", typename);
+        broadcastIntent.putExtra("color", CheckAlertColor(type));
         sendBroadcast(broadcastIntent);
 
 
-
-        Intent broadcastIntent2 = new Intent();
+        /*Intent broadcastIntent2 = new Intent();
         broadcastIntent2.setAction(NotificationActivity.mBroadcastStringAction);
         broadcastIntent2.putExtra("pid", pid);
-        broadcastIntent2.putExtra("typename", typename);
         broadcastIntent2.putExtra("fullname", fullname);
-        broadcastIntent2.putExtra("imagepath", imagepath);
-        sendBroadcast(broadcastIntent2);
+        broadcastIntent2.putExtra("typename", typename);
+        broadcastIntent2.putExtra("timestart", timestart);
+        sendBroadcast(broadcastIntent2);*/
 
+        String imagepath = dbpetient.getImagepath(pid);
+
+        DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
+        dbAlertAll.insertData(fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
+
+        DBAlertEachOne dbEach = new DBAlertEachOne(getApplicationContext());
+        dbEach.insertData(pid, fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
+
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
     }
 }

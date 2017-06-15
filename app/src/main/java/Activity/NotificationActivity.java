@@ -96,8 +96,9 @@ public class NotificationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onButton2Click(View view, int position) {
-                Toast.makeText(getApplicationContext(), "Clicked Button2 in " + mNameUserArray.get(position), Toast.LENGTH_SHORT).show();
+            public void onAppClick(View view, int position) {
+               Intent intent = new Intent(getApplicationContext(),PetientListActivity.class);
+                startActivity(intent);
             }
         };
         mAdapter = new CardViewAdapter(mNameUserArray, itemTouchListener);
@@ -246,6 +247,7 @@ public class NotificationActivity extends AppCompatActivity {
             private TextView txtTstamp;
             private ConstraintLayout constraintLayout;
             private ImageButton btnLocation;
+            private ImageButton btnApp;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -255,6 +257,7 @@ public class NotificationActivity extends AppCompatActivity {
                 constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintBackground);
                 txtTstamp = (TextView) itemView.findViewById(R.id.tstamp);
                 btnLocation = (ImageButton) itemView.findViewById(R.id.btnLocation);
+                btnApp = (ImageButton)itemView.findViewById(R.id.btnApp);
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -271,6 +274,13 @@ public class NotificationActivity extends AppCompatActivity {
 
                     }
                 });
+
+                btnApp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onItemTouchListener.onAppClick(v, getLayoutPosition());
+                    }
+                });
             }
         }
     }
@@ -281,7 +291,7 @@ public class NotificationActivity extends AppCompatActivity {
 
         void onLocationClick(View view, int position);
 
-        void onButton2Click(View view, int position);
+        void onAppClick(View view, int position);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -303,13 +313,10 @@ public class NotificationActivity extends AppCompatActivity {
                         mLngArray.clear();
                         mColorArray.clear();
                         mAdapter.notifyDataSetChanged();
-                       // if(PID == null){
                             DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
                             dbAlertAll.deleteData();
-                       // }else{
                             DBAlertEachOne dbAlertEachOne = new DBAlertEachOne(getApplicationContext());
                             dbAlertEachOne.deleteData();
-                       // }
 
 
 

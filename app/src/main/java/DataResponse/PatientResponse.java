@@ -6,6 +6,7 @@ package DataResponse;
 
 public class PatientResponse {
 
+
     /**
      * SSSN : 1209255801
      * firstname : สุทธิพงษ์
@@ -34,6 +35,7 @@ public class PatientResponse {
      * cousinName3 : -
      * cousinPhone3 :
      * cousinRelation3 : -
+     * alertType : 0
      */
 
     private String SSSN;
@@ -63,6 +65,7 @@ public class PatientResponse {
     private String cousinName3;
     private String cousinPhone3;
     private String cousinRelation3;
+    private String alertType;
 
     public String getSSSN() {
         return SSSN;
@@ -278,5 +281,13 @@ public class PatientResponse {
 
     public void setCousinRelation3(String cousinRelation3) {
         this.cousinRelation3 = cousinRelation3;
+    }
+
+    public String getAlertType() {
+        return alertType;
+    }
+
+    public void setAlertType(String alertType) {
+        this.alertType = alertType;
     }
 }

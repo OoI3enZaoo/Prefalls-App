@@ -31,7 +31,7 @@ public class HomeActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
+        getSupportActionBar().setTitle("Prefalls-Alert");
         Intent intent = getIntent();
         PID = intent.getStringExtra("pid");
         Log.i(TAG,"PID:  " + PID);
@@ -41,7 +41,7 @@ public class HomeActivity extends AppCompatActivity {
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_gauge),
-                        Color.parseColor(colors[0]))
+                        Color.parseColor("#F5F5F5"))
                         //.selectedIcon(getResources().getDrawable(R.drawable.ic_sixth))
                         .title("Fall Risk")
                         .build()
@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_activity),
-                        Color.parseColor(colors[1]))
+                        Color.parseColor("#F5F5F5"))
 //                        .selectedIcon(getResources().getDrawable(R.drawable.ic_eighth))
                         .title("Current Acitivity")
                         .build()
@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
         models.add(
                 new NavigationTabBar.Model.Builder(
                         getResources().getDrawable(R.drawable.ic_map),
-                        Color.parseColor(colors[2]))
+                        Color.parseColor("#F5F5F5"))
                         // .selectedIcon(getResources().getDrawable(R.drawable.ic_seventh))
                         .title("Map")
                         .build()
@@ -131,13 +131,17 @@ public class HomeActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.icon_alert:
                 Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("type",PID);
+                intent.putExtras(bundle);
                 startActivity(intent);
+
                 return true;
 
-            case R.id.icon_logout:
+           /* case R.id.icon_logout:
                 Intent intent2 = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent2);
-                return true;
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -145,7 +149,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 

@@ -41,6 +41,8 @@ public class DBPetient extends SQLiteOpenHelper {
     public static final String CONTACTS_COLUMN_cousinName3 = "cousinName3";
     public static final String CONTACTS_COLUMN_cousinPhone3 = "cousinPhone3";
     public static final String CONTACTS_COLUMN_cousinRelation3 = "cousinRelation3";
+    public static final String CONTACTS_COLUMN_TYPE = "type";
+    public static final String CONTACTS_COLUMN_COLOR = "color";
 
     public DBPetient(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -76,7 +78,10 @@ public class DBPetient extends SQLiteOpenHelper {
                         CONTACTS_COLUMN_cousinRelation2 + " text," +
                         CONTACTS_COLUMN_cousinName3 + " text," +
                         CONTACTS_COLUMN_cousinPhone3 + " text," +
-                        CONTACTS_COLUMN_cousinRelation3 + " text " +
+                        CONTACTS_COLUMN_cousinRelation3 + " text, " +
+                        CONTACTS_COLUMN_TYPE + " text,"+
+                        CONTACTS_COLUMN_COLOR + " text "+
+
                         ")"
         );
     }
@@ -91,7 +96,8 @@ public class DBPetient extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_TABLE_NAME);
         onCreate(db);
     }
-    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3)
+
+    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3,String type, String color)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -122,6 +128,10 @@ public class DBPetient extends SQLiteOpenHelper {
         contentValues.put(CONTACTS_COLUMN_cousinName3, cousinName3);
         contentValues.put(CONTACTS_COLUMN_cousinPhone3, cousinPhone3);
         contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);
+        contentValues.put(CONTACTS_COLUMN_TYPE,type);
+        contentValues.put(CONTACTS_COLUMN_COLOR,color);
+
+
         db.insert(CONTACTS_TABLE_NAME,null,contentValues);
         db.close();
         return true;
@@ -141,5 +151,52 @@ public class DBPetient extends SQLiteOpenHelper {
                     }
          */
     }
+
+
+    public String getFullName(String pid) {
+        String firstname = null;
+        String lastname = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_firstname + " , "+CONTACTS_COLUMN_lastname+" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            firstname = res.getString(res.getColumnIndex(CONTACTS_COLUMN_firstname));
+            lastname = res.getString(res.getColumnIndex(CONTACTS_COLUMN_lastname));
+            res.moveToNext();
+        }
+
+        return firstname + " " + lastname;
+    }
+
+    public String getImagepath(String pid) {
+        String imgpath = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_imgPath +" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            imgpath = res.getString(res.getColumnIndex(CONTACTS_COLUMN_imgPath));
+            res.moveToNext();
+        }
+
+        return imgpath;
+    }
+    public void updateColorFromSSSN(String color, String sssn){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_COLOR+" = '"+color+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
+        db.execSQL(strSQL);
+
+    }
+    public void updateTypeFromSSSN(int type , String sssn){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_TYPE+" = '"+type+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
+        db.execSQL(strSQL);
+    }
+
+
 
 }

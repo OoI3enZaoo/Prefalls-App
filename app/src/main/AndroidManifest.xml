@@ -7,12 +7,13 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
@@ -34,10 +35,15 @@
         <service
             android:name="Service.getAlertMessage"
             android:enabled="true"
-            android:process=":my_service" />
+            android:process=":ben_service" />
 
         <activity android:name=".HomeActivity" />
-        <activity android:name=".NotificationActivity"></activity>
+        <activity android:name=".NotificationActivity"
+            android:parentActivityName=".HomeActivity"/>
+        <activity
+            android:name=".MapActivity"
+            android:theme="@style/AppTheme.NoActionBar">>
+        </activity>
     </application>
 
 </manifest>

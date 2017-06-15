@@ -69,7 +69,6 @@ public class DBUser extends SQLiteOpenHelper {
 
         return Integer.parseInt(place);
     }
-
     public boolean updateName(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();

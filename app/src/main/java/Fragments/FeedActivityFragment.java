@@ -7,8 +7,12 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import Activity.R;
+
+import static Activity.HomeActivity.PID;
 
 
 /**
@@ -16,7 +20,7 @@ import Activity.R;
  */
 public class FeedActivityFragment extends Fragment {
 
-
+    private WebView mWebView;
     public FeedActivityFragment() {
         // Required empty public constructor
     }
@@ -26,7 +30,13 @@ public class FeedActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_feed_activity, container, false);
+         View v = inflater.inflate(R.layout.fragment_feed_activity, container, false);
+        mWebView = (WebView) v.findViewById(R.id.webview_activity);
+        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.loadUrl("http://sysnet.utcc.ac.th/prefalls/activity/index_phone_activity.jsp?SSSN="+PID);
+        return v;
     }
 
 }
