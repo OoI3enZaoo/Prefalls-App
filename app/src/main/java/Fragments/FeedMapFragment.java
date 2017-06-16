@@ -5,11 +5,14 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,6 +20,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -68,7 +75,7 @@ public class FeedMapFragment extends Fragment {
     public static String sym;
     public static String spd;
     public String TAG = "FeedMapFragment";
-
+    public Marker mMarker;
     public FeedMapFragment() {
         // Required empty public constructor
     }
@@ -81,6 +88,8 @@ public class FeedMapFragment extends Fragment {
 
 // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);
+        Button btnTest = (Button)v.findViewById(R.id.btnTest);
+
         mapView.onCreate(savedInstanceState);
 
         // Gets to GoogleMap from the MapView and does initialization stuff
@@ -94,6 +103,15 @@ public class FeedMapFragment extends Fragment {
 
         Log.i(TAG, "PID: " + PID);
         new LatLongTask().execute(PID);
+
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                animateMarker(mMarker,new LatLng(14.474575,99.692139),false);
+            }
+        });
+
 
         return v;
     }
@@ -173,10 +191,11 @@ public class FeedMapFragment extends Fragment {
                 String sSpd = "avg speed: " + spd + " m/s";
                 String res = sStab + sSym + sSpd;
                 // Updates the location and zoom of the MapView
-                LatLng coordinates = new LatLng(mLat, mLong);
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 17);
+                //LatLng coordinates = new LatLng(mLat, mLong);
+                LatLng coordinates = new LatLng(14.554343, 99.747071);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 9);
                 map.animateCamera(cameraUpdate);
-                map.addMarker(new MarkerOptions()
+                mMarker = map.addMarker(new MarkerOptions()
                         .position(coordinates)
                         .title(sPName)
                         .snippet(res));
@@ -215,6 +234,43 @@ public class FeedMapFragment extends Fragment {
 
             }
         }
+    }
+
+    public void animateMarker(final Marker marker, final LatLng toPosition,
+                              final boolean hideMarker) {
+        final Handler handler = new Handler();
+        final long start = SystemClock.uptimeMillis();
+        Projection proj = map.getProjection();
+        Point startPoint = proj.toScreenLocation(marker.getPosition());
+        final LatLng startLatLng = proj.fromScreenLocation(startPoint);
+        final long duration = 500;
+
+        final Interpolator interpolator = new LinearInterpolator();
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                long elapsed = SystemClock.uptimeMillis() - start;
+                float t = interpolator.getInterpolation((float) elapsed
+                        / duration);
+                double lng = t * toPosition.longitude + (1 - t)
+                        * startLatLng.longitude;
+                double lat = t * toPosition.latitude + (1 - t)
+                        * startLatLng.latitude;
+                marker.setPosition(new LatLng(lat, lng));
+
+                if (t < 1.0) {
+                    // Post again 16ms later.
+                    handler.postDelayed(this, 16);
+                } else {
+                    if (hideMarker) {
+                        marker.setVisible(false);
+                    } else {
+                        marker.setVisible(true);
+                    }
+                }
+            }
+        });
     }
 
 }
