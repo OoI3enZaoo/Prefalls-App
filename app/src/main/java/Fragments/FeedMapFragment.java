@@ -2,7 +2,10 @@ package Fragments;
 
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -51,6 +54,7 @@ import java.util.Collection;
 import Activity.LoginActivity;
 import Activity.PetientListActivity;
 import Activity.R;
+import DataResponse.DataMapEvent;
 import DataResponse.LatLongResponse;
 import DataResponse.MemberResponse;
 import SQLite.DBPetient;
@@ -76,6 +80,10 @@ public class FeedMapFragment extends Fragment {
     public static String spd;
     public String TAG = "FeedMapFragment";
     public Marker mMarker;
+    private IntentFilter mIntentFilter;
+    public static final String mBroadcastStringAction = "com.truiton.broadcast.string.home";
+
+
     public FeedMapFragment() {
         // Required empty public constructor
     }
@@ -85,10 +93,11 @@ public class FeedMapFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_feed_map, container, false);
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(mBroadcastStringAction);
 
 // Gets the MapView from the XML layout and creates it
         mapView = (MapView) v.findViewById(R.id.mapview);
-        Button btnTest = (Button)v.findViewById(R.id.btnTest);
 
         mapView.onCreate(savedInstanceState);
 
@@ -104,13 +113,6 @@ public class FeedMapFragment extends Fragment {
         Log.i(TAG, "PID: " + PID);
         new LatLongTask().execute(PID);
 
-        btnTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                animateMarker(mMarker,new LatLng(14.474575,99.692139),false);
-            }
-        });
 
 
         return v;
@@ -120,6 +122,12 @@ public class FeedMapFragment extends Fragment {
     public void onResume() {
         mapView.onResume();
         super.onResume();
+        getActivity().registerReceiver(mReceiver, mIntentFilter);
+    }
+    @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(mReceiver);
+        super.onPause();
     }
 
     @Override
@@ -133,6 +141,53 @@ public class FeedMapFragment extends Fragment {
         super.onLowMemory();
         mapView.onLowMemory();
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String pid = intent.getStringExtra("pid").toString();
+            Double lat = intent.getDoubleExtra("lat",0);
+            Double lng = intent.getDoubleExtra("lng",0);
+            String stab = intent.getStringExtra("stab");
+            String sym = intent.getStringExtra("sym");
+            String spd = intent.getStringExtra("spd");
+            Long ts = intent.getLongExtra("ts",0);
+
+            DBPetient dbPetient = new DBPetient(getActivity());
+            String sPName = "Patient Name: " + dbPetient.getFullName(pid);
+            String sStab = "Stability index: " + stab + "\n";
+            String sSym = "Symmetry index: " + sym + "\n";
+            String sSpd = "avg speed: " + spd + " m/s";
+            String res = sStab + sSym + sSpd;
+
+
+
+            if(PID.equals(pid) ){
+                if(lat != null && lng != null){
+                    LatLng latlng = new LatLng(lat, lng);
+                    String title = sPName;
+                    String snippet = res;
+                    animateMarker(mMarker,latlng,false,title,snippet);
+                    Log.i(TAG,"PID == PID ");
+                }
+
+            }
+            Log.i(TAG,"pid: " +pid + " lat: " + lat + " long: " + lng + " stab: " +stab + " sym: " + sym + " spd: " + spd + " ts: " + ts);
+
+           /* DataMapEvent dataMapEvent = new DataMapEvent();
+            dataMapEvent.setPid(pid);
+            dataMapEvent.setLat(lat);
+            dataMapEvent.setLng(lng);
+            dataMapEvent.setStab(stab);
+            dataMapEvent.setSym(sym);
+            dataMapEvent.setSpd(spd);
+            dataMapEvent.setTs(ts);*/
+
+
+
+
+        }
+    };
 
 
     private class LatLongTask extends AsyncTask<String, Void, String> {
@@ -192,8 +247,8 @@ public class FeedMapFragment extends Fragment {
                 String res = sStab + sSym + sSpd;
                 // Updates the location and zoom of the MapView
                 //LatLng coordinates = new LatLng(mLat, mLong);
-                LatLng coordinates = new LatLng(14.554343, 99.747071);
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 9);
+                LatLng coordinates = new LatLng(mLat, mLong);
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(coordinates, 17);
                 map.animateCamera(cameraUpdate);
                 mMarker = map.addMarker(new MarkerOptions()
                         .position(coordinates)
@@ -237,7 +292,7 @@ public class FeedMapFragment extends Fragment {
     }
 
     public void animateMarker(final Marker marker, final LatLng toPosition,
-                              final boolean hideMarker) {
+                              final boolean hideMarker, final String title , final String snipped) {
         final Handler handler = new Handler();
         final long start = SystemClock.uptimeMillis();
         Projection proj = map.getProjection();
@@ -257,7 +312,12 @@ public class FeedMapFragment extends Fragment {
                         * startLatLng.longitude;
                 double lat = t * toPosition.latitude + (1 - t)
                         * startLatLng.latitude;
+                //marker.hideInfoWindow();
                 marker.setPosition(new LatLng(lat, lng));
+                marker.setTitle(title);
+                marker.setSnippet(snipped);
+               // marker.showInfoWindow();
+              
 
                 if (t < 1.0) {
                     // Post again 16ms later.

@@ -20,6 +20,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.wearable.DataMap;
+
 import net.sf.xenqtt.client.AsyncClientListener;
 import net.sf.xenqtt.client.AsyncMqttClient;
 import net.sf.xenqtt.client.MqttClient;
@@ -49,9 +51,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import Activity.HomeActivity;
 import Activity.PetientListActivity;
 import Activity.R;
 import DataResponse.AlertEvent;
+import DataResponse.DataMapEvent;
+import Fragments.FeedMapFragment;
 import SQLite.DBAlertAll;
 import SQLite.DBAlertEachOne;
 import SQLite.DBAlertType;
@@ -96,6 +101,13 @@ public class getAlertMessage extends Service {
             GetMqttThread mqttThread = createMQTTThread(sssn, topic);
             mqttThread.start();
             mqttThreadHT.put(sssn, mqttThread);
+
+            String topic2 = res.getString(0) + "_pred";//sssn
+            Log.i(TAG, "Topic2: " + topic2);
+            GetMqttThread mqttThread2 = createMQTTThread2(sssn, topic2);
+            mqttThread2.start();
+            mqttThreadHT.put(sssn, mqttThread2);
+
         }
     }
 
@@ -138,7 +150,7 @@ public class getAlertMessage extends Service {
                     public void publishReceived(MqttClient client, final PublishMessage message) {
                         Log.i(TAG, "publishReceived: ");
                         final PublishMessage msg = message;
-                        Log.i(TAG, "Message: " + msg);
+                        Log.i(TAG, "Message1: " + msg);
                         DataResponse.AlertEvent event = parseXML(msg.getPayloadString());
                         String pid = event.getPid();
                         int type = event.getType();
@@ -146,7 +158,6 @@ public class getAlertMessage extends Service {
                         Log.i(TAG, "lng: " + event.getLng());
                         String lat = event.getLat();
                         String lng = event.getLng();
-                        //notification
 
                         if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9) {
                             Notification(pid, type);
@@ -222,6 +233,166 @@ public class getAlertMessage extends Service {
 
     }//end createMQTTThread()
 
+
+    private GetMqttThread createMQTTThread2(final String sssn, final String topic) {
+        return new GetMqttThread() {
+            @Override
+            public void createListener() {
+                Log.i(TAG, "createListener");
+
+                // TODO Auto-generated method stub
+                final CountDownLatch connectLatch = new CountDownLatch(1);
+                final AtomicReference<ConnectReturnCode> connectReturnCode = new AtomicReference<ConnectReturnCode>();
+                mqttListener = new AsyncClientListener() {
+                    @Override
+                    public void publishReceived(MqttClient client, final PublishMessage message) {
+                        Log.i(TAG, "publishReceived: ");
+                        final PublishMessage msg = message;
+                        Log.i(TAG, "Message1: " + msg);
+                        DataResponse.DataMapEvent event = parseXML2(msg.getPayloadString());
+                        String pid = event.getPid();
+                        Double lat = event.getLat();
+                        Double lng = event.getLng();
+                        //notification
+                        //if(!event.getSym().equals("")){
+                        SendBroadCast(pid,lat,lng,event.getStab(),event.getSym(),event.getSpd(),event.getTs());
+                        Log.i(TAG,"SendBroadCast: pid:  "+pid+" lat: "+ lat + " lng: "+ lng + " stab: " +event.getStab()+ " sym: "  + event.getSym() + " spd: " +event.getSpd() + " ts: " + event.getTs() );
+                        //}
+
+
+                        message.ack();
+                    }
+
+                    @Override
+                    public void disconnected(MqttClient client, Throwable cause, boolean reconnecting) {
+
+                        if (cause != null) {
+                            Log.i(TAG, "Disconnected from the broker due to an exception - " + cause);
+                        } else {
+
+                            Log.i(TAG, "Disconnected from the broker.");
+                        }
+                        if (reconnecting) {
+
+                            Log.i(TAG, "Attempting to reconnect to the broker.");
+                        }
+                    }
+
+                    @Override
+                    public void connected(MqttClient client, ConnectReturnCode returnCode) {
+                        Log.i(TAG, "connected");
+                        connectReturnCode.set(returnCode);
+                        connectLatch.countDown();
+                    }
+
+                    @Override
+                    public void published(MqttClient arg0, PublishMessage arg1) {
+                        // TODO Auto-generated method stub
+                        Log.i(TAG, "published");
+
+                    }
+
+                    @Override
+                    public void subscribed(MqttClient arg0,
+                                           Subscription[] arg1, Subscription[] arg2,
+                                           boolean arg3) {
+                        // TODO Auto-generated method stub
+                        Log.i("ben", "subscribed");
+
+                    }
+
+                    @Override
+                    public void unsubscribed(MqttClient arg0, String[] arg1) {
+                        // TODO Auto-generated method stub
+                        Log.i(TAG, "unsubscribed");
+
+                    }
+                };
+            }//end createListener
+
+            public void createClient() {
+                // TODO Auto-generated method stub
+                Log.i(TAG, "createClient");
+                mqttClient = new AsyncMqttClient(mqttBrokerURL, mqttListener, mqttHandlerThreadPoolSize);
+                try {
+                    Log.i(TAG, "createClient in try");
+                    mqttClient.connect(topic, true, mqttUser, mqttPwd);
+                    List<Subscription> subscriptions = new ArrayList<Subscription>();
+                    subscriptions.add(new Subscription(topic, QoS.AT_MOST_ONCE));
+                    mqttClient.subscribe(subscriptions);
+
+                } catch (Exception e) {
+                    Log.i(TAG, "An exception prevented the publishing of the full catalog." + e);
+                }
+            }//end createClient
+
+        };//end new SetMqttThread
+
+    }//end createMQTTThread2()
+
+    private DataMapEvent parseXML2(String xmlText){
+
+        Log.i(TAG, "parseXML2");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        DocumentBuilder builder;
+        Document doc = null;
+        DataMapEvent event = new DataMapEvent();
+        try {
+            builder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(xmlText));
+            doc = builder.parse(is);
+
+            XPathFactory xpathFactory = XPathFactory.newInstance();
+            XPath xpath = xpathFactory.newXPath();
+            Log.i(TAG, "intry");
+
+
+
+            XPathExpression expr2 = xpath.compile("/predict-event/@sym");
+            String sym = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"SYM1: " + sym);
+            event.setSym(sym);
+
+            expr2 = xpath.compile("/predict-event/@pid");
+            String pid = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"pid: " + pid);
+            event.setPid(pid);
+
+            expr2 = xpath.compile("/predict-event/@stab");
+            String stab = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"stab1: " + stab);
+            event.setStab(stab);
+
+            expr2 = xpath.compile("/predict-event/@ts");
+            String ts = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"ts: " + ts);
+            event.setTs(Long.parseLong(ts));
+
+            expr2 = xpath.compile("/predict-event/@spd");
+            String spd = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"spd: " + spd);
+            event.setSpd(spd);
+
+            expr2 = xpath.compile("/predict-event/@lat");
+            String lat = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"lat: " + lat);
+            event.setLat(Double.parseDouble(lat));
+
+            expr2 = xpath.compile("/predict-event/@lon");
+            String lon = ((String) expr2.evaluate(doc, XPathConstants.STRING)).trim();
+            Log.i(TAG,"lon: " + lon);
+            event.setLng(Double.parseDouble(lon));
+
+
+
+        } catch (Exception e) {
+            System.out.println("Exception in parseXML:" + e);
+        }
+
+        return event;
+
+    }
     private AlertEvent parseXML(String xmlText) {
         Log.i(TAG, "parseXML");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -237,7 +408,10 @@ public class getAlertMessage extends Service {
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
 
-            Log.i(TAG, "intry: ");
+            Log.i(TAG, "intry");
+
+
+
 
             XPathExpression expr = xpath.compile("/alert-event/@start");
             String start = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
@@ -260,6 +434,8 @@ public class getAlertMessage extends Service {
             expr = xpath.compile("/alert-event/@lon");
             String lng = ((String) expr.evaluate(doc, XPathConstants.STRING)).trim();
             event.setLng(lng);
+
+
         } catch (Exception e) {
             System.out.println("Exception in parseXML:" + e);
         }
@@ -349,7 +525,21 @@ public class getAlertMessage extends Service {
         dbEach.insertData(pid, fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
 
     }
+    public void SendBroadCast(String pid, Double lat, Double lng ,String stab , String sym , String spd, Long ts){
 
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction(FeedMapFragment.mBroadcastStringAction);
+        broadcastIntent.putExtra("pid", pid);
+        broadcastIntent.putExtra("lat", lat);
+        broadcastIntent.putExtra("lng", lng);
+        broadcastIntent.putExtra("stab", stab);
+        broadcastIntent.putExtra("sym", sym);
+        broadcastIntent.putExtra("spd", spd);
+        broadcastIntent.putExtra("ts", ts);
+        sendBroadcast(broadcastIntent);
+
+
+    }
     public static Bitmap getBitmapFromURL(String src) {
         try {
             URL url = new URL(src);

@@ -1,6 +1,9 @@
 package Activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -12,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import DataResponse.DataMapEvent;
 import Fragments.FeedActivityFragment;
 import Fragments.FeedMapFragment;
 
@@ -24,6 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     protected String TAG = "HomeActivity";
     public static String PID = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +40,7 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         PID = intent.getStringExtra("pid");
         Log.i(TAG,"PID:  " + PID);
+
         final String[] colors = getResources().getStringArray(R.array.default_preview);
         final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.navigateTabBar);
         final ArrayList<NavigationTabBar.Model> models = new ArrayList<>();
@@ -152,5 +158,7 @@ public class HomeActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
+
+
 
 }

@@ -11,44 +11,89 @@ public class AlertEvent {
     Long end;
     String lat;
     String lng;
+    String sym;
+    String stab;
+    Long ts;
+    String spd;
 
-//object ที่รับค่าหลังจากถูกแปลงจาก xml
+    //object ที่รับค่าหลังจากถูกแปลงจาก xml
     public void setPid(String pid) {
         this.pid = pid;
     }
-    public String getPid(){
+
+    public String getPid() {
         return pid;
     }
+
     public void setType(int type) {
         this.type = type;
     }
-    public Integer getType(){
+
+    public Integer getType() {
         return type;
     }
 
     public void setStart(Long start) {
         this.start = start;
     }
-    public Long getStart(){
+
+    public Long getStart() {
         return start;
     }
 
     public void setEnd(Long end) {
         this.end = end;
     }
-    public Long getEnd(){
+
+    public Long getEnd() {
         return end;
     }
-    public void setLat(String lat){
+
+    public void setLat(String lat) {
         this.lat = lat;
     }
-    public String getLat(){
+
+    public String getLat() {
         return lat;
     }
-    public void setLng(String lng){
+
+    public void setLng(String lng) {
         this.lng = lng;
     }
-    public String getLng(){
+
+    public String getLng() {
         return lng;
+    }
+
+    public void setSym(String sym) {
+        this.sym = sym;
+    }
+
+    public String getSym() {
+        return sym;
+    }
+
+    public void setStab(String stab) {
+        this.stab = stab;
+    }
+
+    public String getStab() {
+        return stab;
+    }
+
+    public void setTs(long ts) {
+        this.ts = ts;
+    }
+
+    public Long getTs() {
+        return ts;
+    }
+
+    public void setSpd(String spd) {
+        this.spd = spd;
+    }
+
+    public String getSpd() {
+        return spd;
     }
 }
