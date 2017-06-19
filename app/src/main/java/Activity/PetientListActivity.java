@@ -72,6 +72,7 @@ public class PetientListActivity extends AppCompatActivity {
         mIntentFilter.addAction(mBroadcastStringAction);
         mIntentFilter.addAction(mBroadcastIntegerAction);
         dialog = new ProgressDialog(PetientListActivity.this);
+        getSupportActionBar().setTitle("Patient List");
         startDialog();
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
             @Override
@@ -283,7 +284,7 @@ public class PetientListActivity extends AppCompatActivity {
 
                 Log.i(TAG, "alert_type: " + res.length);
                 DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
-                dbAlertType.insertData("0","Normal");
+                dbAlertType.insertData("0","ปกติ");
                 for (int i = 0; i < res.length; i++) {
                     dbAlertType.insertData(res[i].getAlertType(), res[i].getAlertName());
                 }
@@ -371,7 +372,10 @@ public class PetientListActivity extends AppCompatActivity {
                 intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
-
+            case R.id.icon_setting:
+                Intent intent1 =new Intent(getApplicationContext(),SettingActivity.class);
+                startActivity(intent1);
+                return true;
             case R.id.icon_logout:
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(PetientListActivity.this);

@@ -5,7 +5,7 @@ package DataResponse;
  */
 
 public class CheckAlertColor {
-    private  static String color = "#bae1e1";
+    private  static String color = "#CCFFBB";
 
 
 

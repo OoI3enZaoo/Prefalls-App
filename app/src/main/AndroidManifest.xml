@@ -35,16 +35,20 @@
         <service
             android:name="Service.getAlertMessage"
             android:enabled="true"
-
             android:process=":ben_service" />
 
         <activity android:name=".HomeActivity" />
-        <activity android:name=".NotificationActivity"
-            android:parentActivityName=".HomeActivity"/>
+        <activity
+            android:name=".NotificationActivity"
+            android:parentActivityName=".HomeActivity" />
         <activity
             android:name=".MapActivity"
-            android:theme="@style/AppTheme.NoActionBar">>
+            android:theme="@style/AppTheme.NoActionBar">
+            >
         </activity>
+        <activity android:name=".SettingActivity"
+            android:parentActivityName=".PetientListActivity"
+            ></activity>
     </application>
 
 </manifest>

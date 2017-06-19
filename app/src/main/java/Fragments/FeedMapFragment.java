@@ -317,7 +317,7 @@ public class FeedMapFragment extends Fragment {
                 marker.setTitle(title);
                 marker.setSnippet(snipped);
                // marker.showInfoWindow();
-              
+
 
                 if (t < 1.0) {
                     // Post again 16ms later.

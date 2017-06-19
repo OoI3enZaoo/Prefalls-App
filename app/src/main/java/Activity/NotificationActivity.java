@@ -55,7 +55,7 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        getSupportActionBar().setTitle("Notification");
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
         Log.i(TAG, "TYPE: " + type);
@@ -116,7 +116,7 @@ public class NotificationActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        registerReceiver(mReceiver, mIntentFilter);
+        //registerReceiver(mReceiver, mIntentFilter);
         Log.i(TAG, "onReSume()");
         mNameUserArray.clear();
         mNameTypeArray.clear();
@@ -168,7 +168,6 @@ public class NotificationActivity extends AppCompatActivity {
             Toast.makeText(this, "PID:" + PID, Toast.LENGTH_SHORT).show();
         }
         mAdapter.notifyDataSetChanged();
-
     }
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -194,7 +193,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        unregisterReceiver(mReceiver);
+//        unregisterReceiver(mReceiver);
         super.onPause();
     }
 
@@ -313,10 +312,15 @@ public class NotificationActivity extends AppCompatActivity {
                         mLngArray.clear();
                         mColorArray.clear();
                         mAdapter.notifyDataSetChanged();
+                        if(PID == null){
                             DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
                             dbAlertAll.deleteData();
+                        }else{
                             DBAlertEachOne dbAlertEachOne = new DBAlertEachOne(getApplicationContext());
                             dbAlertEachOne.deleteData();
+                        }
+
+
 
 
 

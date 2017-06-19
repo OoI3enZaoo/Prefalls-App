@@ -22,6 +22,7 @@ import Fragments.FeedMapFragment;
 import java.util.ArrayList;
 
 import Fragments.FeedGaugeFragment;
+import SQLite.DBPetient;
 import devlight.io.library.ntb.NavigationTabBar;
 
 public class HomeActivity extends AppCompatActivity {
@@ -36,10 +37,13 @@ public class HomeActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        getSupportActionBar().setTitle("Prefalls-Alert");
+
         Intent intent = getIntent();
         PID = intent.getStringExtra("pid");
         Log.i(TAG,"PID:  " + PID);
+
+        DBPetient dbPetient = new DBPetient(getApplicationContext());
+        getSupportActionBar().setTitle(dbPetient.getFullName(PID) + "(" +dbPetient.getNickName(PID)+ ")");
 
         final String[] colors = getResources().getStringArray(R.array.default_preview);
         final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.navigateTabBar);

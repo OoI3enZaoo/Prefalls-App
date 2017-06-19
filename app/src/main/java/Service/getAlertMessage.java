@@ -52,6 +52,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import Activity.HomeActivity;
+import Activity.NotificationActivity;
 import Activity.PetientListActivity;
 import Activity.R;
 import DataResponse.AlertEvent;
@@ -61,6 +62,7 @@ import SQLite.DBAlertAll;
 import SQLite.DBAlertEachOne;
 import SQLite.DBAlertType;
 import SQLite.DBPetient;
+import SQLite.DBUser;
 
 import static DataResponse.CheckAlertColor.CheckAlertColor;
 
@@ -445,7 +447,9 @@ public class getAlertMessage extends Service {
 
     public void Notification(String pid, int type) {
 
-        Log.i(TAG, "Notification()");
+        DBUser dbUser = new DBUser(getApplicationContext());
+        Log.i(TAG, "Notification getalert: " + dbUser.getAlert());
+        if(dbUser.getAlert() == 1){
         DBPetient dbpetient = new DBPetient(getApplicationContext());
         String fullname = dbpetient.getFullName(pid);
         String image = dbpetient.getImagepath(pid);
@@ -454,7 +458,7 @@ public class getAlertMessage extends Service {
         String typename = dbAlertType.getAlertTypeName(type);
         String message = fullname + " " + typename;
         String title = "Prefalls Notification";
-        
+
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
@@ -473,7 +477,7 @@ public class getAlertMessage extends Service {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(title))
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message));
 
-        countalert ++;
+        countalert++;
         Intent resultIntent = new Intent(this, PetientListActivity.class);
         resultIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -486,6 +490,9 @@ public class getAlertMessage extends Service {
         //xxxxx add vibration xxxxx
         Vibrator v2 = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         v2.vibrate(vibratePeriod);
+    }else{
+            Log.i(TAG,"notification close");
+        }
 
     }
 
@@ -507,8 +514,8 @@ public class getAlertMessage extends Service {
         broadcastIntent.putExtra("color", CheckAlertColor(type));
         sendBroadcast(broadcastIntent);
 
-
-        /*Intent broadcastIntent2 = new Intent();
+/*
+        Intent broadcastIntent2 = new Intent();
         broadcastIntent2.setAction(NotificationActivity.mBroadcastStringAction);
         broadcastIntent2.putExtra("pid", pid);
         broadcastIntent2.putExtra("fullname", fullname);

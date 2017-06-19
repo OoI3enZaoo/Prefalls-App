@@ -17,6 +17,7 @@ public class DBUser extends SQLiteOpenHelper {
     public static final String CONTACTS_COLUMN_NAME = "name";
     public static final String CONTACTS_COLUMN_STATUS = "statusLogin";
     public static final String CONTACTS_COLUMN_COUNT_PETIENT = "count_petient";
+    public static final String CONTACTS_COLUMN_ALERT = "alert";
 
 
     public DBUser(Context context) {
@@ -33,12 +34,13 @@ public class DBUser extends SQLiteOpenHelper {
                         "(" +
                         CONTACTS_COLUMN_NAME + " text," +
                         CONTACTS_COLUMN_STATUS + " integer," +
-                        CONTACTS_COLUMN_COUNT_PETIENT + " integer" +
+                        CONTACTS_COLUMN_COUNT_PETIENT + " integer," +
+                        CONTACTS_COLUMN_ALERT + " integer" +
                         ")"
         );
 
         db.execSQL(
-                "INSERT INTO " + CONTACTS_TABLE_NAME + " VALUES ('x',0,0)"
+                "INSERT INTO " + CONTACTS_TABLE_NAME + " VALUES ('x',0,0,1)"
 
         );
     }
@@ -47,6 +49,25 @@ public class DBUser extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CONTACTS_TABLE_NAME);
         onCreate(db);
+    }
+    public boolean updateAlert(int status) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CONTACTS_COLUMN_ALERT, status);
+        db.update(CONTACTS_TABLE_NAME, contentValues, null, null);
+        return true;
+    }
+    public int getAlert() {
+        String place = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_ALERT + " from " + CONTACTS_TABLE_NAME, null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            place = res.getString(res.getColumnIndex(CONTACTS_COLUMN_ALERT));
+            res.moveToNext();
+        }
+        return Integer.parseInt(place);
     }
     public boolean updateStatus(int status) {
         SQLiteDatabase db = this.getWritableDatabase();

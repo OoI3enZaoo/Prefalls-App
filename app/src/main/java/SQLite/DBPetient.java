@@ -170,6 +170,19 @@ public class DBPetient extends SQLiteOpenHelper {
         return firstname + " " + lastname;
     }
 
+    public String getNickName(String pid) {
+        String nickname = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_nickname +" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            nickname = res.getString(res.getColumnIndex(CONTACTS_COLUMN_nickname));
+            res.moveToNext();
+        }
+        return nickname;
+    }
     public String getImagepath(String pid) {
         String imgpath = null;
         SQLiteDatabase db = this.getReadableDatabase();
