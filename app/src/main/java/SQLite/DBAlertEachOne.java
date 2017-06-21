@@ -38,7 +38,7 @@ public class DBAlertEachOne extends SQLiteOpenHelper {
                         CONTACTS_COLUMN_NAME + " text, " +
                         CONTACTS_COLUMN_TYPE + " text, " +
                         CONTACTS_COLUMN_IMAGE + " text, " +
-                        CONTACTS_COLUMN_TIME + " integer, " +
+                        CONTACTS_COLUMN_TIME + " text, " +
                         CONTACTS_COLUMN_LAT + " text, " +
                         CONTACTS_COLUMN_LONG + " text, " +
                         CONTACTS_COLUMN_COLOR + " text " +
@@ -74,7 +74,7 @@ public class DBAlertEachOne extends SQLiteOpenHelper {
     }
     public Cursor getAllData(String pid) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select "+CONTACTS_COLUMN_NAME+","+CONTACTS_COLUMN_TYPE+", "+CONTACTS_COLUMN_IMAGE+" ,datetime("+CONTACTS_COLUMN_TIME+"/1000, 'unixepoch', 'localtime') ,"+CONTACTS_COLUMN_LAT+","+CONTACTS_COLUMN_LONG+","+CONTACTS_COLUMN_COLOR+" from " + CONTACTS_TABLE_NAME +"  WHERE " + CONTACTS_COLUMN_PID +"='"+pid+"' ORDER BY "+CONTACTS_COLUMN_TIME + " DESC", null);
+        Cursor res = db.rawQuery("select "+CONTACTS_COLUMN_NAME+","+CONTACTS_COLUMN_TYPE+", "+CONTACTS_COLUMN_IMAGE+" ,"+CONTACTS_COLUMN_TIME+" ,"+CONTACTS_COLUMN_LAT+","+CONTACTS_COLUMN_LONG+","+CONTACTS_COLUMN_COLOR+" from " + CONTACTS_TABLE_NAME +"  WHERE " + CONTACTS_COLUMN_PID +"='"+pid+"' ORDER BY "+CONTACTS_COLUMN_TIME + " DESC limit 10", null);
         return res;
 
         /*

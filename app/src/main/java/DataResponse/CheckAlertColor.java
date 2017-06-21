@@ -10,7 +10,7 @@ public class CheckAlertColor {
 
 
     public static String CheckAlertColor(int type){
-        if(type == 3 || type == 4){color = "#FFCC00";}else if(type == 7 || type == 8 || type == 9){color = "#B33A3A";}
+        if(type == 3 || type == 8){color = "#FFCC00";}else if(type == 7 || type == 4 || type == 9){color = "#B33A3A";}
         return color;
     }
 }

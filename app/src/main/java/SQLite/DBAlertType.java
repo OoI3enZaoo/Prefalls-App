@@ -44,7 +44,7 @@ public class DBAlertType extends SQLiteOpenHelper {
     public String getAlertTypeName(int type) {
         String alertname = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_ALERT_NAME + " from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_ALERT_TYPE+"='"+type+"'", null);
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_ALERT_NAME + " from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_ALERT_TYPE+"='"+type+"' limit 15", null);
         res.moveToFirst();
         while (res.isAfterLast() == false) {
             alertname = res.getString(res.getColumnIndex(CONTACTS_COLUMN_ALERT_NAME));

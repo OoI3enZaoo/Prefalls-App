@@ -2,6 +2,7 @@ package Activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -16,8 +17,7 @@ public class SettingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Setting");
-
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='000000'>Setting</font>"));
         mAlert = (CheckBox)findViewById(R.id.chkNotification);
         DBUser dbUser = new DBUser(getApplicationContext());
         int alert = dbUser.getAlert();

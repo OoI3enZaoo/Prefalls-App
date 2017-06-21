@@ -1,5 +1,11 @@
 package DataResponse;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 /**
  * Created by Ben on 11/6/2560.
  */
@@ -7,8 +13,8 @@ package DataResponse;
 public class AlertEvent {
     String pid;
     int type;
-    Long start;
-    Long end;
+    String start;
+    String end;
     String lat;
     String lng;
     String sym;
@@ -34,18 +40,22 @@ public class AlertEvent {
     }
 
     public void setStart(Long start) {
-        this.start = start;
+        Date date = new Date(start);
+        SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String java_date = jdf.format(date);
+        this.start = java_date;
     }
-
-    public Long getStart() {
+    public String getStart() {
         return start;
     }
-
     public void setEnd(Long end) {
-        this.end = end;
+        Date date = new Date(end);
+        SimpleDateFormat jdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String java_date = jdf.format(date);
+        this.end = java_date;
     }
 
-    public Long getEnd() {
+    public String getEnd() {
         return end;
     }
 

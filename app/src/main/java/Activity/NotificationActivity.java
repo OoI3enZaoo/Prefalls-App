@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,17 +57,18 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Notification");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='000000'>Notification</font>"));
+
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
         Log.i(TAG, "TYPE: " + type);
         if (type.equals("all")) {
             PID = null;
-            Toast.makeText(getApplicationContext(), "all", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(getApplicationContext(), "all", Toast.LENGTH_SHORT).show();
         } else {
 
             PID = type;
-            Toast.makeText(getApplicationContext(), "each", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getApplicationContext(), "each", Toast.LENGTH_SHORT).show();
         }
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(mBroadcastStringAction);
@@ -158,6 +161,7 @@ public class NotificationActivity extends AppCompatActivity {
                     mNameUserArray.add(res.getString(0));
                     mNameTypeArray.add(res.getString(1));
                     mImagePathArray.add(res.getString(2));
+
                     mTimeArray.add(res.getString(3));
                     mLatArray.add(res.getString(4));
                     mLngArray.add(res.getString(5));
@@ -226,7 +230,18 @@ public class NotificationActivity extends AppCompatActivity {
             String sdf = new SimpleDateFormat("YYYY-MM-dd HH:mm:ss").format(date);*/
 
             viewHolder.txtTstamp.setText(mTimeArray.get(i));
-            viewHolder.txtStatus.setText(mNameTypeArray.get(i));
+            Log.i(TAG,"getString "+mTimeArray.get(i));
+
+            viewHolder.txtStatus.setEllipsize(TextUtils.TruncateAt.END);
+            viewHolder.txtStatus.setMaxLines(2);
+
+            if(mNameTypeArray.get(i).length() >= 45){
+                // statusArray.add(alertName.substring(0,30) + "\n" + "HELLO");
+                viewHolder.txtStatus.setText(mNameTypeArray.get(i).substring(0,41) + "\n" + mNameTypeArray.get(i).substring(41,mNameTypeArray.get(i).length()));
+            }else{
+                viewHolder.txtStatus.setText(mNameTypeArray.get(i));
+            }
+
             viewHolder.constraintLayout.setBackgroundColor(Color.parseColor(mColorArray.get(i)));
 
 

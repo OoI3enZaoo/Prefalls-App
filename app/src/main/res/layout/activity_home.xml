@@ -21,8 +21,8 @@
         app:ntb_badge_gravity="top"
         app:ntb_badge_position="right"
         app:ntb_badge_size="10sp"
-
         app:ntb_badge_use_typeface="true"
+
         app:ntb_bg_color="@color/md_white_1000"
         app:ntb_icon_size_fraction="0.5"
         app:ntb_inactive_color="#000"
@@ -31,7 +31,8 @@
         app:ntb_tinted="true"
         app:ntb_title_mode="all"
         app:ntb_title_size="10sp"
-        app:ntb_titled="true" />
+        app:ntb_titled="true"
+        android:layout_marginTop="-10dp" />
 
     <View
         android:id="@+id/view"

@@ -43,6 +43,7 @@ public class DBPetient extends SQLiteOpenHelper {
     public static final String CONTACTS_COLUMN_cousinRelation3 = "cousinRelation3";
     public static final String CONTACTS_COLUMN_TYPE = "type";
     public static final String CONTACTS_COLUMN_COLOR = "color";
+    public static final String CONTACTS_COLUMN_TSTART = "tstart";
 
     public DBPetient(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -80,7 +81,8 @@ public class DBPetient extends SQLiteOpenHelper {
                         CONTACTS_COLUMN_cousinPhone3 + " text," +
                         CONTACTS_COLUMN_cousinRelation3 + " text, " +
                         CONTACTS_COLUMN_TYPE + " text,"+
-                        CONTACTS_COLUMN_COLOR + " text "+
+                        CONTACTS_COLUMN_COLOR + " text, "+
+                        CONTACTS_COLUMN_TSTART + " text "+
 
                         ")"
         );
@@ -97,7 +99,7 @@ public class DBPetient extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3,String type, String color)
+    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3,String type, String color,String tstart)
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -130,8 +132,7 @@ public class DBPetient extends SQLiteOpenHelper {
         contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);
         contentValues.put(CONTACTS_COLUMN_TYPE,type);
         contentValues.put(CONTACTS_COLUMN_COLOR,color);
-
-
+        contentValues.put(CONTACTS_COLUMN_TSTART,tstart);
         db.insert(CONTACTS_TABLE_NAME,null,contentValues);
         db.close();
         return true;
@@ -207,6 +208,11 @@ public class DBPetient extends SQLiteOpenHelper {
     public void updateTypeFromSSSN(int type , String sssn){
         SQLiteDatabase db = this.getWritableDatabase();
         String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_TYPE+" = '"+type+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
+        db.execSQL(strSQL);
+    }
+    public void updateTstartFromSSSN(String tstart , String sssn){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_TSTART+" = '"+tstart+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
         db.execSQL(strSQL);
     }
 

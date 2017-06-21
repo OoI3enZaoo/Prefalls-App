@@ -9,9 +9,9 @@ public class PatientResponse {
 
     /**
      * SSSN : 1209255801
-     * firstname : สุทธิพงษ์
-     * lastname : พู่ประเสริฐศักดิ์
-     * nickname : อาม
+     * firstname : อัตศมา
+     * lastname : อุดมสิน
+     * nickname : เอิร์ท
      * sex : ชาย
      * birthday : 2015-12-23
      * address : -
@@ -36,6 +36,7 @@ public class PatientResponse {
      * cousinPhone3 :
      * cousinRelation3 : -
      * alertType : 0
+     * tstart : N/D
      */
 
     private String SSSN;
@@ -66,6 +67,7 @@ public class PatientResponse {
     private String cousinPhone3;
     private String cousinRelation3;
     private String alertType;
+    private String tstart;
 
     public String getSSSN() {
         return SSSN;
@@ -289,5 +291,13 @@ public class PatientResponse {
 
     public void setAlertType(String alertType) {
         this.alertType = alertType;
+    }
+
+    public String getTstart() {
+        return tstart;
+    }
+
+    public void setTstart(String tstart) {
+        this.tstart = tstart;
     }
 }

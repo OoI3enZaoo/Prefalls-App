@@ -13,8 +13,14 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.view.CollapsibleActionView;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,6 +32,8 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +57,8 @@ import okhttp3.Response;
 
 import java.lang.reflect.Type;
 
+import static java.security.AccessController.getContext;
+
 public class PetientListActivity extends AppCompatActivity {
 
     public static CardViewAdapter mAdapter;
@@ -58,6 +68,7 @@ public class PetientListActivity extends AppCompatActivity {
     public static ArrayList<String> imgArray = new ArrayList<String>();
     public static ArrayList<String> statusArray = new ArrayList<String>();
     public static ArrayList<String> colorArray = new ArrayList<String>();
+    public static ArrayList<String> tstartArray = new ArrayList<String>();
     public static String TAG = "PetientActivity";
     private IntentFilter mIntentFilter;
     public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
@@ -72,7 +83,8 @@ public class PetientListActivity extends AppCompatActivity {
         mIntentFilter.addAction(mBroadcastStringAction);
         mIntentFilter.addAction(mBroadcastIntegerAction);
         dialog = new ProgressDialog(PetientListActivity.this);
-        getSupportActionBar().setTitle("Patient List");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Patient List </font>"));
+
         startDialog();
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
             @Override
@@ -121,11 +133,20 @@ public class PetientListActivity extends AppCompatActivity {
                 DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
                 String alertName = dbAlertType.getAlertTypeName(Integer.parseInt(res.getString(27)));
                 String color = res.getString(28);
+                String tstart =res.getString(29);
                 pidArray.add(pid);
                 nameArray.add(name);
                 imgArray.add(imagePath);
-                statusArray.add(alertName);
+                Log.i(TAG,"alerttypename Lenghh:  " +alertName.length());
+                if(alertName.length() >= 30){
+                       // statusArray.add(alertName.substring(0,30) + "\n" + "HELLO");
+                    statusArray.add(alertName);
+                }else{
+                    statusArray.add(alertName);
+                }
+
                 colorArray.add(color);
+                tstartArray.add(tstart);
                 stopDialog();
             }
             Log.i(TAG, "get from SQlite");
@@ -165,9 +186,16 @@ public class PetientListActivity extends AppCompatActivity {
 
             Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(i)).into(viewHolder.imgProfile);
             viewHolder.txtName.setText(nameArray.get(i));
-            viewHolder.txtStatus.setText(statusArray.get(i));
-
+            viewHolder.txtStatus.setEllipsize(TextUtils.TruncateAt.MIDDLE);
+            viewHolder.txtStatus.setMaxLines(3);
+            if(statusArray.get(i).length() >= 45){
+                // statusArray.add(alertName.substring(0,30) + "\n" + "HELLO");
+                viewHolder.txtStatus.setText(statusArray.get(i).substring(0,41) + "\n" + statusArray.get(i).substring(41,statusArray.get(i).length()));
+            }else{
+                viewHolder.txtStatus.setText(statusArray.get(i));
+            }
             viewHolder.constraintLayout.setBackgroundColor(Color.parseColor(colorArray.get(i)));
+            viewHolder.txtTstart.setText(tstartArray.get(i));
 
 
         }
@@ -184,6 +212,7 @@ public class PetientListActivity extends AppCompatActivity {
             private CircleImageView imgProfile;
             private TextView txtStatus;
             private ConstraintLayout constraintLayout;
+            private TextView txtTstart;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -191,7 +220,7 @@ public class PetientListActivity extends AppCompatActivity {
                 imgProfile = (CircleImageView) itemView.findViewById(R.id.img_profile);
                 txtStatus = (TextView) itemView.findViewById(R.id.txtstatus);
                 constraintLayout = (ConstraintLayout) itemView.findViewById(R.id.constraintBackground);
-
+                txtTstart = (TextView)itemView.findViewById(R.id.tstart);
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -226,19 +255,20 @@ public class PetientListActivity extends AppCompatActivity {
 
                 Log.i(TAG, "" + res.length);
                 for (int i = 0; i < res.length; i++) {
+
                     int type = Integer.parseInt(res[i].getAlertType());
                     String color = CheckAlertColor.CheckAlertColor(type);
                     Log.i(TAG, "firstname" + res[i].getFirstname());
                     DBPetient dbPetient = new DBPetient(getApplicationContext());
-                    nameArray.add(res[i].getFirstname() + " " + res[i].getLastname());
+                    dbPetient.insertData(res[i].getSSSN(), res[i].getFirstname(), res[i].getLastname(), res[i].getNickname(), res[i].getSex(), res[i].getBirthday(), res[i].getAddress(), res[i].getImgPath(), res[i].getWeight(), res[i].getHeight(), res[i].getApparent(), res[i].getDiseases(), res[i].getMedicine(), res[i].getAllergicMed(), res[i].getAllergicFood(), res[i].getDoctorName(), res[i].getDoctorPhone(), res[i].getHospitalName(), res[i].getCousinName1(), res[i].getCousinPhone1(), res[i].getCousinRelation1(), res[i].getCousinName2(), res[i].getCousinPhone2(), res[i].getCousinRelation2(), res[i].getCousinName3(), res[i].getCousinPhone3(), res[i].getCousinRelation3(),res[i].getAlertType(),color,res[i].getTstart());
+                    nameArray.add(res[i].getFirstname() + " " + res[i].getLastname()+"("+ dbPetient.getNickName(res[i].getSSSN())+ ")");
                     imgArray.add(res[i].getImgPath());
                     pidArray.add(res[i].getSSSN());
                     DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
                     String alertTypeName = dbAlertType.getAlertTypeName(type);
                     statusArray.add(alertTypeName);
                     colorArray.add(color);
-
-                    dbPetient.insertData(res[i].getSSSN(), res[i].getFirstname(), res[i].getLastname(), res[i].getNickname(), res[i].getSex(), res[i].getBirthday(), res[i].getAddress(), res[i].getImgPath(), res[i].getWeight(), res[i].getHeight(), res[i].getApparent(), res[i].getDiseases(), res[i].getMedicine(), res[i].getAllergicMed(), res[i].getAllergicFood(), res[i].getDoctorName(), res[i].getDoctorPhone(), res[i].getHospitalName(), res[i].getCousinName1(), res[i].getCousinPhone1(), res[i].getCousinRelation1(), res[i].getCousinName2(), res[i].getCousinPhone2(), res[i].getCousinRelation2(), res[i].getCousinName3(), res[i].getCousinPhone3(), res[i].getCousinRelation3(),res[i].getAlertType(),color);
+                    tstartArray.add(res[i].getTstart());
 
                 }
 
@@ -320,20 +350,23 @@ public class PetientListActivity extends AppCompatActivity {
             String pid = intent.getStringExtra("pid").toString();
             String typename = intent.getStringExtra("typename");
             String color = intent.getStringExtra("color");
+            String tstart = intent.getStringExtra("tstart");
             int type = intent.getIntExtra("type", 0);
+
             Log.i(TAG, "getPIDFromService: " + pid);
             Log.i(TAG, "gettypeFromService: " + typename);
             int count = recyclerView.getChildCount();
             DBPetient dbPetient = new DBPetient(getApplicationContext());
             dbPetient.updateColorFromSSSN(color,pid);
             dbPetient.updateTypeFromSSSN(type,pid);
-
+            dbPetient.updateTstartFromSSSN(tstart,pid);
             for (int i = 0; i < count; i++) {
                 View view = recyclerView.getChildAt(i);
                 if (pid.equals(pidArray.get(i))) {
                     Log.i(TAG, "imgArray Test : " + imgArray.get(i));
                     colorArray.set(i, color);
                     statusArray.set(i,typename);
+                    tstartArray.set(i,tstart);
                     mAdapter.notifyDataSetChanged();
 
                     break;
@@ -412,9 +445,10 @@ public class PetientListActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu mMenu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main, mMenu);
+
         return true;
     }
 

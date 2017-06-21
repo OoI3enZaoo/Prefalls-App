@@ -38,9 +38,12 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -512,6 +515,8 @@ public class getAlertMessage extends Service {
         broadcastIntent.putExtra("type", type);
         broadcastIntent.putExtra("typename", typename);
         broadcastIntent.putExtra("color", CheckAlertColor(type));
+        broadcastIntent.putExtra("tstart", timestart);
+        Log.i(TAG,"TSTARTNA: " + timestart);
         sendBroadcast(broadcastIntent);
 
 /*

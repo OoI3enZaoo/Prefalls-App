@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,7 +44,7 @@ public class HomeActivity extends AppCompatActivity {
         Log.i(TAG,"PID:  " + PID);
 
         DBPetient dbPetient = new DBPetient(getApplicationContext());
-        getSupportActionBar().setTitle(dbPetient.getFullName(PID) + "(" +dbPetient.getNickName(PID)+ ")");
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>"+dbPetient.getFullName(PID) + "(" +dbPetient.getNickName(PID)+ ")"+"</font>"));
 
         final String[] colors = getResources().getStringArray(R.array.default_preview);
         final NavigationTabBar navigationTabBar = (NavigationTabBar) findViewById(R.id.navigateTabBar);
@@ -54,6 +55,7 @@ public class HomeActivity extends AppCompatActivity {
                         Color.parseColor("#F5F5F5"))
                         //.selectedIcon(getResources().getDrawable(R.drawable.ic_sixth))
                         .title("Fall Risk")
+                        .badgeTitle("2")
                         .build()
         );
         models.add(

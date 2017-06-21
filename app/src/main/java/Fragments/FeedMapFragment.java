@@ -312,11 +312,11 @@ public class FeedMapFragment extends Fragment {
                         * startLatLng.longitude;
                 double lat = t * toPosition.latitude + (1 - t)
                         * startLatLng.latitude;
-                //marker.hideInfoWindow();
+                marker.hideInfoWindow();
                 marker.setPosition(new LatLng(lat, lng));
                 marker.setTitle(title);
                 marker.setSnippet(snipped);
-               // marker.showInfoWindow();
+                marker.showInfoWindow();
 
 
                 if (t < 1.0) {

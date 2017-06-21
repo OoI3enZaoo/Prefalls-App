@@ -38,6 +38,7 @@
             android:process=":ben_service" />
 
         <activity android:name=".HomeActivity" />
+
         <activity
             android:name=".NotificationActivity"
             android:parentActivityName=".HomeActivity" />
