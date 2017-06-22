@@ -213,6 +213,7 @@ public class DBPetient extends SQLiteOpenHelper {
 
         return imgpath;
     }
+
     public void updateColorFromSSSN(String color, String sssn){
 
         SQLiteDatabase db = this.getWritableDatabase();

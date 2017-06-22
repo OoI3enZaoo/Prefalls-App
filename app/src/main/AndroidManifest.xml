@@ -16,6 +16,7 @@
         android:roundIcon="@mipmap/icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+
         tools:replace="android:icon">
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
