@@ -11,6 +11,15 @@
         android:icon="@drawable/ic_alert"
         android:orderInCategory="4"
         android:title="alert"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/icon_profile"
+        android:icon="@drawable/ic_profile"
+        android:orderInCategory="4"
+        android:title="alert"
         app:showAsAction="ifRoom" />
+
+
+
 
 </menu>

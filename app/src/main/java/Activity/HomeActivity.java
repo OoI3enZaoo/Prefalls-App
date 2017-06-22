@@ -149,7 +149,13 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
 
                 return true;
-
+            case R.id.icon_profile:
+                Intent intent1 = new Intent(getApplicationContext(),ProfileActivity.class);
+                Bundle bundle2 = new Bundle();
+                bundle2.putString("pid",PID);
+                intent1.putExtras(bundle2);
+                startActivity(intent1);
+                return true;
            /* case R.id.icon_logout:
                 Intent intent2 = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent2);

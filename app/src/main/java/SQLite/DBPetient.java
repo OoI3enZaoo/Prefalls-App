@@ -103,9 +103,9 @@ public class DBPetient extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(CONTACTS_COLUMN_SSSN, SSSN);
-        contentValues.put(CONTACTS_COLUMN_firstname, firstname);
-        contentValues.put(CONTACTS_COLUMN_lastname, lastname);
+        contentValues.put(CONTACTS_COLUMN_SSSN, SSSN);//0
+        contentValues.put(CONTACTS_COLUMN_firstname, firstname);//1
+        contentValues.put(CONTACTS_COLUMN_lastname, lastname);//2
         contentValues.put(CONTACTS_COLUMN_nickname, nickname);
         contentValues.put(CONTACTS_COLUMN_sex, sex);
         contentValues.put(CONTACTS_COLUMN_birthday, birthday);
@@ -113,33 +113,48 @@ public class DBPetient extends SQLiteOpenHelper {
         contentValues.put(CONTACTS_COLUMN_imgPath, imgPath);
         contentValues.put(CONTACTS_COLUMN_weight, weight);
         contentValues.put(CONTACTS_COLUMN_height, height);
-        contentValues.put(CONTACTS_COLUMN_apparent, apparent);
+        contentValues.put(CONTACTS_COLUMN_apparent, apparent);//10
         contentValues.put(CONTACTS_COLUMN_diseases, diseases);
         contentValues.put(CONTACTS_COLUMN_medicine, medicine);
         contentValues.put(CONTACTS_COLUMN_AllergicMed, AllergicMed);
         contentValues.put(CONTACTS_COLUMN_AllergicFood, AllergicFood);
-        contentValues.put(CONTACTS_COLUMN_doctorName, doctorName);
+        contentValues.put(CONTACTS_COLUMN_doctorName, doctorName);//15
         contentValues.put(CONTACTS_COLUMN_doctorPhone, doctorPhone );
         contentValues.put(CONTACTS_COLUMN_hospitalName, hospitalName);
         contentValues.put(CONTACTS_COLUMN_cousinName1, cousinName1);
         contentValues.put(CONTACTS_COLUMN_cousinPhone1, cousinPhone1);
-        contentValues.put(CONTACTS_COLUMN_cousinRelation1, cousinRelation1);
+        contentValues.put(CONTACTS_COLUMN_cousinRelation1, cousinRelation1);//20
         contentValues.put(CONTACTS_COLUMN_cousinName2, cousinName2);
         contentValues.put(CONTACTS_COLUMN_cousinPhone2, cousinPhone2);
         contentValues.put(CONTACTS_COLUMN_cousinRelation2, cousinRelation2);
         contentValues.put(CONTACTS_COLUMN_cousinName3, cousinName3);
-        contentValues.put(CONTACTS_COLUMN_cousinPhone3, cousinPhone3);
-        contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);
+        contentValues.put(CONTACTS_COLUMN_cousinPhone3, cousinPhone3);//25
+        contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);//26
         contentValues.put(CONTACTS_COLUMN_TYPE,type);
         contentValues.put(CONTACTS_COLUMN_COLOR,color);
         contentValues.put(CONTACTS_COLUMN_TSTART,tstart);
-        db.insert(CONTACTS_TABLE_NAME,null,contentValues);
+        db.insert(CONTACTS_TABLE_NAME,null,contentValues);//30
         db.close();
         return true;
     }
     public Cursor getAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME, null);
+        return res;
+        /*
+            how to use
+          Cursor res = dbGrid.getAllData();
+                if (res.getCount() == 0) {
+                    Log.i("griddata", "Nothing found");
+                } else {
+                    while (res.moveToNext()) {
+                        String sName = res.getString(0);
+                    }
+         */
+    }
+    public Cursor getAllDataEach(String pid) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN + " = " + "'"+pid+"'", null);
         return res;
         /*
             how to use
