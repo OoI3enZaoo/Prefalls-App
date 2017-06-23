@@ -30,10 +30,8 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-import SQLite.DBAlertAll;
-import SQLite.DBAlertEachOne;
+import SQLite.DBAlert;
 import SQLite.DBPetient;
-import SQLite.DBUser;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class NotificationActivity extends AppCompatActivity {
@@ -128,47 +126,44 @@ public class NotificationActivity extends AppCompatActivity {
         mLatArray.clear();
         mLngArray.clear();
         mColorArray.clear();
+        DBAlert dbAlert = new DBAlert(getApplicationContext());
         if (PID == null) {
             Log.i(TAG, "PID == null");
-            DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
-            Cursor res = dbAlertAll.getAllData();
+
+            Cursor res = dbAlert.getAllData();
 
             Log.i(TAG, "res.getCount() " + res.getCount());
             if (res.getCount() == 0) {
                 Log.i(TAG, "Nothing found");
             } else {
                 while (res.moveToNext()) {
-                    mNameUserArray.add(res.getString(0));
-                    mNameTypeArray.add(res.getString(1));
-                    mImagePathArray.add(res.getString(2));
-                    mTimeArray.add(res.getString(3));
-                    mLatArray.add(res.getString(4));
-                    mLngArray.add(res.getString(5));
-                    mColorArray.add(res.getString(6));
+                    mNameUserArray.add(res.getString(1));
+                    mNameTypeArray.add(res.getString(2));
+                    mImagePathArray.add(res.getString(3));
+                    mTimeArray.add(res.getString(4));
+                    mLatArray.add(res.getString(5));
+                    mLngArray.add(res.getString(6));
+                    mColorArray.add(res.getString(7));
                 }
             }
 
         } else {
-            DBAlertEachOne dbAlertEachOne = new DBAlertEachOne(getApplicationContext());
+            Cursor res = dbAlert.getAllDataEach(PID);
 
-            Cursor res = dbAlertEachOne.getAllData(PID);
-            ;
             Log.i(TAG, "dbAlertEachOne.getCount(): " + res.getCount());
             if (res.getCount() == 0) {
                 Log.i(TAG, "DBAlertEachOne == 0");
             } else {
                 while (res.moveToNext()) {
-                    mNameUserArray.add(res.getString(0));
-                    mNameTypeArray.add(res.getString(1));
-                    mImagePathArray.add(res.getString(2));
-
-                    mTimeArray.add(res.getString(3));
-                    mLatArray.add(res.getString(4));
-                    mLngArray.add(res.getString(5));
-                    mColorArray.add(res.getString(6));
+                    mNameUserArray.add(res.getString(1));
+                    mNameTypeArray.add(res.getString(2));
+                    mImagePathArray.add(res.getString(3));
+                    mTimeArray.add(res.getString(4));
+                    mLatArray.add(res.getString(5));
+                    mLngArray.add(res.getString(6));
+                    mColorArray.add(res.getString(7));
                 }
             }
-
             Toast.makeText(this, "PID:" + PID, Toast.LENGTH_SHORT).show();
         }
         mAdapter.notifyDataSetChanged();
@@ -327,12 +322,12 @@ public class NotificationActivity extends AppCompatActivity {
                         mLngArray.clear();
                         mColorArray.clear();
                         mAdapter.notifyDataSetChanged();
+                        DBAlert dbAlert = new DBAlert(getApplicationContext());
                         if(PID == null){
-                            DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
-                            dbAlertAll.deleteData();
+                            dbAlert.deleteData();
                         }else{
-                            DBAlertEachOne dbAlertEachOne = new DBAlertEachOne(getApplicationContext());
-                            dbAlertEachOne.deleteData();
+
+                            dbAlert.deleteDataEach(PID);
                         }
 
 

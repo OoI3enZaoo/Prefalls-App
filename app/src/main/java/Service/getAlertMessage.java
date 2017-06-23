@@ -15,12 +15,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.google.android.gms.wearable.DataMap;
 
 import net.sf.xenqtt.client.AsyncClientListener;
 import net.sf.xenqtt.client.AsyncMqttClient;
@@ -38,12 +35,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,15 +48,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import Activity.HomeActivity;
-import Activity.NotificationActivity;
 import Activity.PetientListActivity;
 import Activity.R;
 import DataResponse.AlertEvent;
 import DataResponse.DataMapEvent;
 import Fragments.FeedMapFragment;
-import SQLite.DBAlertAll;
-import SQLite.DBAlertEachOne;
+import SQLite.DBAlert;
 import SQLite.DBAlertType;
 import SQLite.DBPetient;
 import SQLite.DBUser;
@@ -261,6 +252,8 @@ public class getAlertMessage extends Service {
                         //notification
                         //if(!event.getSym().equals("")){
                         SendBroadCast(pid,lat,lng,event.getStab(),event.getSym(),event.getSpd(),event.getTs());
+                        DBAlert dbAlert = new DBAlert(getApplicationContext());
+                        dbAlert.updateData(pid,event.getStab(),event.getSym(),event.getSpd());
                         Log.i(TAG,"SendBroadCast: pid:  "+pid+" lat: "+ lat + " lng: "+ lng + " stab: " +event.getStab()+ " sym: "  + event.getSym() + " spd: " +event.getSpd() + " ts: " + event.getTs() );
                         //}
 
@@ -530,11 +523,9 @@ public class getAlertMessage extends Service {
 
         String imagepath = dbpetient.getImagepath(pid);
 
-        DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
-        dbAlertAll.insertData(fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
+        DBAlert dbAlert = new DBAlert(getApplicationContext());
+        dbAlert.insertData(pid,fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
 
-        DBAlertEachOne dbEach = new DBAlertEachOne(getApplicationContext());
-        dbEach.insertData(pid, fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
 
     }
     public void SendBroadCast(String pid, Double lat, Double lng ,String stab , String sym , String spd, Long ts){

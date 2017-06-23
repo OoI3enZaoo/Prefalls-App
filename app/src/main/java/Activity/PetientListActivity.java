@@ -33,8 +33,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,8 +41,7 @@ import java.util.List;
 import DataResponse.AlertTypeResponse;
 import DataResponse.CheckAlertColor;
 import DataResponse.PatientResponse;
-import SQLite.DBAlertAll;
-import SQLite.DBAlertEachOne;
+import SQLite.DBAlert;
 import SQLite.DBAlertType;
 import SQLite.DBPetient;
 import SQLite.DBUser;
@@ -101,8 +98,8 @@ public class PetientListActivity extends AppCompatActivity {
                 Log.i(TAG, "Long Tapped");
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(PetientListActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.customdialog, null);
-                TextView mStab = (TextView) mView.findViewById(R.id.xxx);
-                TextView mSym = (TextView) mView.findViewById(R.id.xxxf);
+                TextView mStab = (TextView) mView.findViewById(R.id.txtStab);
+                TextView mSym = (TextView) mView.findViewById(R.id.txtSym);
                 Button mDetail = (Button) mView.findViewById(R.id.btnDetail);
                 Button mAlert = (Button) mView.findViewById(R.id.btnAlert);
                 TextView mTime =(TextView)mView.findViewById(R.id.txtTime);
@@ -110,6 +107,27 @@ public class PetientListActivity extends AppCompatActivity {
                 ImageButton mProfile = (ImageButton)mView.findViewById(R.id.ibProfile);
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
                 mTime.setText(tstartArray.get(position));
+                DBAlert dbAlert = new DBAlert(getApplicationContext());
+                Cursor res = dbAlert.getAllDataEach(pidArray.get(position));
+                if(res.getCount() == 0){
+                    Log.i(TAG,"res == 0 ");
+                    mStab.setText("-");
+                    mSym.setText("-");
+                }else{
+                    while (res.moveToNext()){
+                        String stab = res.getString(8);
+                        String sym = res.getString(9);
+                        String spd = res.getString(10);
+                        Log.i(TAG,"STAB: " + stab);
+                        Log.i(TAG,"SYM: " + sym);
+                        Log.i(TAG,"SPD: " + spd);
+                        mStab.setText(stab);
+                        mSym.setText(sym);
+
+
+
+                    }
+                }
 
 
                 mProfile.setOnClickListener(new View.OnClickListener(){
@@ -121,6 +139,25 @@ public class PetientListActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                mDetail.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(getApplicationContext(), "Tapped " + pidArray.get(position) + "", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("pid", pidArray.get(position));
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
+                });
+                mAlert.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        
+                    }
+                });
+
+
              /*   if (event.getAction() == MotionEvent.ACTION_UP) {
 
                     Toast.makeText(PetientListActivity.this, "ActionUP", Toast.LENGTH_SHORT).show();
@@ -494,12 +531,8 @@ public class PetientListActivity extends AppCompatActivity {
                                 "Logout", Toast.LENGTH_SHORT).show();
                         DBUser dbUser = new DBUser(getApplicationContext());
                         dbUser.updateStatus(0);
-                        DBAlertAll dbAlertAll = new DBAlertAll(getApplicationContext());
-                        dbAlertAll.deleteData();
-                        DBAlertEachOne dbAlertEachOne = new DBAlertEachOne(getApplicationContext());
-                        dbAlertEachOne.deleteData();
-
-
+                        DBAlert dbAlert = new DBAlert(getApplicationContext());
+                        dbAlert.deleteData();
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
