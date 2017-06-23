@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,6 +41,8 @@ public class NotificationActivity extends AppCompatActivity {
     public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
     public static final String mBroadcastIntegerAction = "com.truiton.broadcast.integer";
     public String TAG = "NotificationActivity";
+    SwipeRefreshLayout mSwipeRefreshLayout;
+    ArrayList<String> mPidArray = new ArrayList<>();
     ArrayList<String> mNameUserArray = new ArrayList<>();
     ArrayList<String> mNameTypeArray = new ArrayList<>();
     ArrayList<String> mImagePathArray = new ArrayList<>();
@@ -56,6 +59,7 @@ public class NotificationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_notification);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(Html.fromHtml("<font color='000000'>Notification</font>"));
+        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout) ;
 
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
@@ -87,10 +91,10 @@ public class NotificationActivity extends AppCompatActivity {
             public void onLocationClick(View view, int position) {
                 Toast.makeText(getApplicationContext(), "Clicked Button1 in " + mNameUserArray.get(position), Toast.LENGTH_SHORT).show();
                 Bundle bundle = new Bundle();
-                bundle.putString("lat", mLatArray.get(position));
-                bundle.putString("lng", mLngArray.get(position));
-                Log.i(TAG, "LAT: " + mLatArray.get(position));
-                Log.i(TAG, "LONG: " + mLngArray.get(position));
+                bundle.putString("pid", mPidArray.get(position));
+                bundle.putString("time", mTimeArray.get(position));
+                Log.i(TAG, "PID: " + mPidArray.get(position));
+                Log.i(TAG, "Time: " + mTimeArray.get(position));
                 Intent intent = new Intent(getApplicationContext(), MapActivity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
@@ -112,8 +116,31 @@ public class NotificationActivity extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
 
 
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Refresh items
+                refreshItems();
+            }
+        });
+
+
+    }
+    public void refreshItems() {
+        // Load items
+        // ...
+
+        // Load complete
+        onItemsLoadComplete();
     }
 
+    public void onItemsLoadComplete() {
+        // Update the adapter and notify data set changed
+        // ...
+
+        // Stop refresh animation
+        mSwipeRefreshLayout.setRefreshing(false);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -121,6 +148,7 @@ public class NotificationActivity extends AppCompatActivity {
         Log.i(TAG, "onReSume()");
         mNameUserArray.clear();
         mNameTypeArray.clear();
+        mPidArray.clear();
         mImagePathArray.clear();
         mTimeArray.clear();
         mLatArray.clear();
@@ -137,6 +165,8 @@ public class NotificationActivity extends AppCompatActivity {
                 Log.i(TAG, "Nothing found");
             } else {
                 while (res.moveToNext()) {
+
+                    mPidArray.add(res.getString(0));
                     mNameUserArray.add(res.getString(1));
                     mNameTypeArray.add(res.getString(2));
                     mImagePathArray.add(res.getString(3));
@@ -148,13 +178,14 @@ public class NotificationActivity extends AppCompatActivity {
             }
 
         } else {
-            Cursor res = dbAlert.getAllDataEach(PID);
+            Cursor res = dbAlert.getAllDataEach(PID,15);
 
             Log.i(TAG, "dbAlertEachOne.getCount(): " + res.getCount());
             if (res.getCount() == 0) {
                 Log.i(TAG, "DBAlertEachOne == 0");
             } else {
                 while (res.moveToNext()) {
+                    mPidArray.add(res.getString(0));
                     mNameUserArray.add(res.getString(1));
                     mNameTypeArray.add(res.getString(2));
                     mImagePathArray.add(res.getString(3));
@@ -314,6 +345,7 @@ public class NotificationActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         Toast.makeText(getApplicationContext(),
                                 "Remove", Toast.LENGTH_SHORT).show();
+                        mPidArray.clear();
                         mNameUserArray.clear();
                         mNameTypeArray.clear();
                         mImagePathArray.clear();

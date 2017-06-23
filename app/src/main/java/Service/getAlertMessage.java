@@ -157,7 +157,7 @@ public class getAlertMessage extends Service {
 
                         if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9) {
                             Notification(pid, type);
-                            SaveData(pid, type, String.valueOf(event.getStart()), lat, lng);
+                            SaveData(pid, type,event.getStart(), lat, lng);
                         }
                         message.ack();
                     }
@@ -253,7 +253,8 @@ public class getAlertMessage extends Service {
                         //if(!event.getSym().equals("")){
                         SendBroadCast(pid,lat,lng,event.getStab(),event.getSym(),event.getSpd(),event.getTs());
                         DBAlert dbAlert = new DBAlert(getApplicationContext());
-                        dbAlert.updateData(pid,event.getStab(),event.getSym(),event.getSpd());
+
+                        Log.i(TAG,"InsertData => " + dbAlert.insertData(pid,event.getStab(),event.getSym(),event.getSpd(),event.getTs()));
                         Log.i(TAG,"SendBroadCast: pid:  "+pid+" lat: "+ lat + " lng: "+ lng + " stab: " +event.getStab()+ " sym: "  + event.getSym() + " spd: " +event.getSpd() + " ts: " + event.getTs() );
                         //}
 
@@ -343,7 +344,7 @@ public class getAlertMessage extends Service {
 
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
-            Log.i(TAG, "intry");
+
 
 
 
@@ -406,7 +407,7 @@ public class getAlertMessage extends Service {
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
 
-            Log.i(TAG, "intry");
+
 
 
 
@@ -440,16 +441,13 @@ public class getAlertMessage extends Service {
 
         return event;
     }
-
     public void Notification(String pid, int type) {
-
         DBUser dbUser = new DBUser(getApplicationContext());
         Log.i(TAG, "Notification getalert: " + dbUser.getAlert());
         if(dbUser.getAlert() == 1){
         DBPetient dbpetient = new DBPetient(getApplicationContext());
         String fullname = dbpetient.getFullName(pid);
         String image = dbpetient.getImagepath(pid);
-        Log.i(TAG, "TYPE: " + type);
         DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
         String typename = dbAlertType.getAlertTypeName(type);
         String message = fullname + " " + typename;
@@ -498,8 +496,6 @@ public class getAlertMessage extends Service {
         DBPetient dbpetient = new DBPetient(getApplicationContext());
         String fullname = dbpetient.getFullName(pid);
 
-        // String imagepath =dbpetient.getImagepath(pid);
-
         //--send broadcast
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(PetientListActivity.mBroadcastStringAction);
@@ -512,23 +508,13 @@ public class getAlertMessage extends Service {
         Log.i(TAG,"TSTARTNA: " + timestart);
         sendBroadcast(broadcastIntent);
 
-/*
-        Intent broadcastIntent2 = new Intent();
-        broadcastIntent2.setAction(NotificationActivity.mBroadcastStringAction);
-        broadcastIntent2.putExtra("pid", pid);
-        broadcastIntent2.putExtra("fullname", fullname);
-        broadcastIntent2.putExtra("typename", typename);
-        broadcastIntent2.putExtra("timestart", timestart);
-        sendBroadcast(broadcastIntent2);*/
-
         String imagepath = dbpetient.getImagepath(pid);
-
         DBAlert dbAlert = new DBAlert(getApplicationContext());
-        dbAlert.insertData(pid,fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type));
+        Log.i(TAG,"UpdateData => "+ dbAlert.updateData(pid,fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type)));
 
 
     }
-    public void SendBroadCast(String pid, Double lat, Double lng ,String stab , String sym , String spd, Long ts){
+    public void SendBroadCast(String pid, Double lat, Double lng ,String stab , String sym , String spd, String ts){
 
         Intent broadcastIntent = new Intent();
         broadcastIntent.setAction(FeedMapFragment.mBroadcastStringAction);

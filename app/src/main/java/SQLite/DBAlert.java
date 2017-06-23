@@ -69,38 +69,37 @@ public class DBAlert extends SQLiteOpenHelper {
         db.delete(CONTACTS_TABLE_NAME, CONTACTS_COLUMN_PID +" = '" + pid+"'", null);
         db.close();
     }
-    public boolean insertData(String pid, String name, String type, String image, String time, String lat, String lng, String color) {
+    public boolean updateData(String pid, String name, String type, String image, String time, String lat, String lng, String color) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(CONTACTS_COLUMN_PID, pid);
         contentValues.put(CONTACTS_COLUMN_NAME, name);
         contentValues.put(CONTACTS_COLUMN_TYPE, type);
         contentValues.put(CONTACTS_COLUMN_IMAGE, image);
-        contentValues.put(CONTACTS_COLUMN_TIME, time);
         contentValues.put(CONTACTS_COLUMN_LAT, lat);
         contentValues.put(CONTACTS_COLUMN_LONG, lng);
         contentValues.put(CONTACTS_COLUMN_COLOR, color);
-      /*  contentValues.put(CONTACTS_COLUMN_STAB, "");
-        contentValues.put(CONTACTS_COLUMN_SYM, "");
-        contentValues.put(CONTACTS_COLUMN_SPD, "");*/
-        db.insert(CONTACTS_TABLE_NAME, null, contentValues);
-        db.close();
-        return true;
-    }
-    public boolean updateData(String pid, String stab , String sym, String spd){
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(CONTACTS_COLUMN_STAB,stab);
-        contentValues.put(CONTACTS_COLUMN_SYM,sym);
-        contentValues.put(CONTACTS_COLUMN_SPD,spd);
-        db.update(CONTACTS_TABLE_NAME,contentValues,CONTACTS_COLUMN_PID + " = '" +pid + "'",null);
+        db.update(CONTACTS_TABLE_NAME,contentValues,CONTACTS_COLUMN_PID + " = '" +pid + "' AND " + CONTACTS_COLUMN_TIME + " = '" + time +"'",null);
         db.close();
         return true;
     }
 
-    public Cursor getAllDataEach(String pid) {
+    public boolean insertData(String pid, String stab , String sym, String spd,String time){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit 10", null);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(CONTACTS_COLUMN_PID,pid);
+        contentValues.put(CONTACTS_COLUMN_STAB,stab);
+        contentValues.put(CONTACTS_COLUMN_SYM,sym);
+        contentValues.put(CONTACTS_COLUMN_SPD,spd);
+        contentValues.put(CONTACTS_COLUMN_TIME,time);
+        db.insert(CONTACTS_TABLE_NAME, null, contentValues);
+        db.close();
+        return true;
+    }
+
+    public Cursor getAllDataEach(String pid,int size) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit " +size, null);
         return res;
         /*
             how to use
@@ -129,6 +128,10 @@ public class DBAlert extends SQLiteOpenHelper {
                     }
          */
     }
-
+    public Cursor getDataInTime(String pid , String time) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' AND "+ CONTACTS_COLUMN_TIME +" = '" + time + "' limit 1" , null);
+        return res;
+    }
 
 }

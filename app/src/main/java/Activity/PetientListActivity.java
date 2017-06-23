@@ -108,7 +108,7 @@ public class PetientListActivity extends AppCompatActivity {
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
                 mTime.setText(tstartArray.get(position));
                 DBAlert dbAlert = new DBAlert(getApplicationContext());
-                Cursor res = dbAlert.getAllDataEach(pidArray.get(position));
+                Cursor res = dbAlert.getDataInTime(pidArray.get(position),tstartArray.get(position));
                 if(res.getCount() == 0){
                     Log.i(TAG,"res == 0 ");
                     mStab.setText("-");
@@ -123,9 +123,6 @@ public class PetientListActivity extends AppCompatActivity {
                         Log.i(TAG,"SPD: " + spd);
                         mStab.setText(stab);
                         mSym.setText(sym);
-
-
-
                     }
                 }
 
@@ -153,7 +150,10 @@ public class PetientListActivity extends AppCompatActivity {
                 mAlert.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        
+
+                        Intent intent = new Intent(getApplicationContext(),NotificationActivity.class);
+                        intent.putExtra("type",pidArray.get(position));
+                        startActivity(intent);
                     }
                 });
 

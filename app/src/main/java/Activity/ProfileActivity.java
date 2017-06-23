@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -40,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity {
     TextView mCousinName3;
     TextView mCousinPhone3;
     TextView mCousinRelation3;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
         PID = intent.getStringExtra("pid");
         String fullname = dbPetient.getFullName(PID);
         String nicknam = dbPetient.getNickName(PID);
-        getSupportActionBar().setTitle("Profile of: " + fullname + "(" + nicknam + ")");
-
+        getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Profile of: " + fullname + "(" + nicknam + ")</font>"));
         Cursor res = dbPetient.getAllDataEach(PID);
         if (res.getCount() == 0) {
             Log.i(TAG, "Nothing found");
@@ -82,13 +83,13 @@ public class ProfileActivity extends AppCompatActivity {
                 String cousinName3 = res.getString(24);
                 String cousinPhone3 = res.getString(25);
                 String cousinRelation3 = res.getString(26);
-               /* mFirstname = (TextView)findViewById(R.id.firstname);
-                mLastname = (TextView)findViewById(R.id.lastname);
-                mNickname2 = (TextView)findViewById(R.id.nickname2);
-                mSex = (TextView)findViewById(R.id.sex);
-                mBirthday = (TextView)findViewById(R.id.birthday);
-                mAddress = (TextView)findViewById(R.id.address);
-                mImgPath = (TextView)findViewById(R.id.imgPath);
+                mFirstname = (TextView) findViewById(R.id.firstname);
+                mLastname = (TextView) findViewById(R.id.lastname);
+                mNickname2 = (TextView) findViewById(R.id.nickname2);
+                mSex = (TextView) findViewById(R.id.sex);
+                mBirthday = (TextView) findViewById(R.id.birthday);
+                mAddress = (TextView) findViewById(R.id.address);
+                /*mImgPath = (TextView)findViewById(R.id.imgPath);
                 mWeight = (TextView)findViewById(R.id.weight);
                 mHeight = (TextView)findViewById(R.id.height);
                 mApparent = (TextView)findViewById(R.id.apparent);
@@ -109,7 +110,12 @@ public class ProfileActivity extends AppCompatActivity {
                 mCousinPhone3 = (TextView)findViewById(R.id.cousinPhone3);
                 mCousinRelation3 = (TextView)findViewById(R.id.cousinRelation3);*/
 
-
+                mFirstname.setText(firstname);
+                mLastname.setText(lastname);
+                mNickname2.setText(nickname2);
+                mSex.setText(sex);
+                mBirthday.setText(birthday);
+                mAddress.setText(address);
             }
         }
 
