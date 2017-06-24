@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Prefalls-App</string>
+    <string name="app_name">PreFalls</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>

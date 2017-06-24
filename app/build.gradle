@@ -4,11 +4,12 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
     defaultConfig {
-        applicationId "com.example.ben.prefalls_app"
+        applicationId "com.ben.prefalls"
         minSdkVersion 25
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        multiDexEnabled = true
+        versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
