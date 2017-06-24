@@ -78,7 +78,7 @@ public class PetientListActivity extends AppCompatActivity {
         mIntentFilter.addAction(mBroadcastStringAction);
         mIntentFilter.addAction(mBroadcastIntegerAction);
         dialog = new ProgressDialog(PetientListActivity.this);
-        getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Patient List </font>"));
+        //getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Patient List </font>"));
 
         startDialog();
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
