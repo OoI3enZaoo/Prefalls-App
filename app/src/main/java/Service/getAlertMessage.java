@@ -74,7 +74,7 @@ public class getAlertMessage extends Service {
     private String sssn = "admin";
     //private String topic = "RFG2D3T6ET_alert";
     private ArrayList<String> sssnArray = new ArrayList<>();
-    private int vibratePeriod = 500;
+    private int vibratePeriod = 3000;
     public int countalert = 1;
 
     @Override
@@ -105,54 +105,54 @@ public class getAlertMessage extends Service {
             mqttThreadHT.put(sssn, mqttThread2);
 
         }
-    }
+            }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
 
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        Log.i(TAG, "Level memory: " + level);
+        @Override
+        public void onTrimMemory(int level) {
+            super.onTrimMemory(level);
+            Log.i(TAG, "Level memory: " + level);
 
-    }
+        }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
-        Log.i(TAG, "In onTaskRemoved");
-    }
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+        @Override
+        public void onTaskRemoved(Intent rootIntent) {
+            super.onTaskRemoved(rootIntent);
+            Log.i(TAG, "In onTaskRemoved");
+        }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+        }
 
 
-    private GetMqttThread createMQTTThread(final String sssn, final String topic) {
-        return new GetMqttThread() {
-            @Override
-            public void createListener() {
-                Log.i(TAG, "createListener");
+        private GetMqttThread createMQTTThread(final String sssn, final String topic) {
+            return new GetMqttThread() {
+                @Override
+                public void createListener() {
+                    Log.i(TAG, "createListener");
 
-                // TODO Auto-generated method stub
-                final CountDownLatch connectLatch = new CountDownLatch(1);
-                final AtomicReference<ConnectReturnCode> connectReturnCode = new AtomicReference<ConnectReturnCode>();
-                mqttListener = new AsyncClientListener() {
-                    @Override
-                    public void publishReceived(MqttClient client, final PublishMessage message) {
-                        Log.i(TAG, "publishReceived: ");
-                        final PublishMessage msg = message;
-                        Log.i(TAG, "Message1: " + msg);
-                        DataResponse.AlertEvent event = parseXML(msg.getPayloadString());
-                        String pid = event.getPid();
-                        int type = event.getType();
-                        Log.i(TAG, "lat: " + event.getLat());
-                        Log.i(TAG, "lng: " + event.getLng());
-                        String lat = event.getLat();
+                    // TODO Auto-generated method stub
+                    final CountDownLatch connectLatch = new CountDownLatch(1);
+                    final AtomicReference<ConnectReturnCode> connectReturnCode = new AtomicReference<ConnectReturnCode>();
+                    mqttListener = new AsyncClientListener() {
+                        @Override
+                        public void publishReceived(MqttClient client, final PublishMessage message) {
+                            Log.i(TAG, "publishReceived: ");
+                            final PublishMessage msg = message;
+                            Log.i(TAG, "Message1: " + msg);
+                            DataResponse.AlertEvent event = parseXML(msg.getPayloadString());
+                            String pid = event.getPid();
+                            int type = event.getType();
+                            Log.i(TAG, "lat: " + event.getLat());
+                            Log.i(TAG, "lng: " + event.getLng());
+                            String lat = event.getLat();
                         String lng = event.getLng();
 
                         if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9) {
