@@ -155,7 +155,7 @@ public class getAlertMessage extends Service {
                             String lat = event.getLat();
                         String lng = event.getLng();
 
-                        if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9) {
+                        if (type == 3 || type == 4 || type == 7 || type == 8 || type == 9 || type == 2 || type == 5 || type == 6) {
                             Notification(pid, type);
                             SaveData(pid, type,event.getStart(), lat, lng);
                         }
@@ -509,6 +509,7 @@ public class getAlertMessage extends Service {
         sendBroadcast(broadcastIntent);
 
         String imagepath = dbpetient.getImagepath(pid);
+
         DBAlert dbAlert = new DBAlert(getApplicationContext());
         Log.i(TAG,"UpdateData => "+ dbAlert.updateData(pid,fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type)));
 

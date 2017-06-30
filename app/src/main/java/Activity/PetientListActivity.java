@@ -104,6 +104,7 @@ public class PetientListActivity extends AppCompatActivity {
                 Button mAlert = (Button) mView.findViewById(R.id.btnAlert);
                 TextView mTime =(TextView)mView.findViewById(R.id.txtTime);
                 ImageView mPatient = (ImageView)mView.findViewById(R.id.imgPatient);
+                TextView mStatus = (TextView)mView.findViewById(R.id.txtStatus);
                 ImageButton mProfile = (ImageButton)mView.findViewById(R.id.ibProfile);
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
                 mTime.setText(tstartArray.get(position));
@@ -115,6 +116,7 @@ public class PetientListActivity extends AppCompatActivity {
                     mSym.setText("-");
                 }else{
                     while (res.moveToNext()){
+                        String status = res.getString(2);
                         String stab = res.getString(8);
                         String sym = res.getString(9);
                         String spd = res.getString(10);
@@ -123,6 +125,8 @@ public class PetientListActivity extends AppCompatActivity {
                         Log.i(TAG,"SPD: " + spd);
                         mStab.setText(stab);
                         mSym.setText(sym);
+                        mStatus.setTextColor(Color.RED);
+                        mStatus.setText(status);
                     }
                 }
 
@@ -421,14 +425,12 @@ public class PetientListActivity extends AppCompatActivity {
                 }.getType();
                 Collection<AlertTypeResponse> enums = gson.fromJson(result, collectionType);
                 AlertTypeResponse[] res = enums.toArray(new AlertTypeResponse[enums.size()]);
-
                 Log.i(TAG, "alert_type: " + res.length);
                 DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
                 dbAlertType.insertData("0", "ปกติ");
                 for (int i = 0; i < res.length; i++) {
                     dbAlertType.insertData(res[i].getAlertType(), res[i].getAlertName());
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -471,7 +473,7 @@ public class PetientListActivity extends AppCompatActivity {
             dbPetient.updateTypeFromSSSN(type, pid);
             dbPetient.updateTstartFromSSSN(tstart, pid);
             for (int i = 0; i < count; i++) {
-                View view = recyclerView.getChildAt(i);
+               /* View view = recyclerView.getChildAt(i);*/
                 if (pid.equals(pidArray.get(i))) {
                     Log.i(TAG, "imgArray Test : " + imgArray.get(i));
                     colorArray.set(i, color);
