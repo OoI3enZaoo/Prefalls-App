@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,7 +38,7 @@ import java.util.Collection;
 import java.util.List;
 
 import DataResponse.AlertTypeResponse;
-import DataResponse.CheckAlertColor;
+import DataResponse.CheckAlert;
 import DataResponse.PatientResponse;
 import SQLite.DBAlert;
 import SQLite.DBAlertType;
@@ -98,10 +97,10 @@ public class PetientListActivity extends AppCompatActivity {
                 Log.i(TAG, "Long Tapped");
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(PetientListActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.customdialog, null);
-                TextView mStab = (TextView) mView.findViewById(R.id.txtStab);
-                TextView mSym = (TextView) mView.findViewById(R.id.txtSym);
                 Button mDetail = (Button) mView.findViewById(R.id.btnDetail);
                 Button mAlert = (Button) mView.findViewById(R.id.btnAlert);
+                TextView mStab = (TextView) mView.findViewById(R.id.txtStab);
+                TextView mSym = (TextView) mView.findViewById(R.id.txtSym);
                 TextView mTime =(TextView)mView.findViewById(R.id.txtTime);
                 ImageView mPatient = (ImageView)mView.findViewById(R.id.imgPatient);
                 TextView mStatus = (TextView)mView.findViewById(R.id.txtStatus);
@@ -371,7 +370,7 @@ public class PetientListActivity extends AppCompatActivity {
                 for (int i = 0; i < res.length; i++) {
 
                     int type = Integer.parseInt(res[i].getAlertType());
-                    String color = CheckAlertColor.CheckAlertColor(type);
+                    String color = CheckAlert.CheckAlertColor(type);
                     Log.i(TAG, "firstname" + res[i].getFirstname());
                     DBPetient dbPetient = new DBPetient(getApplicationContext());
                     dbPetient.insertData(res[i].getSSSN(), res[i].getFirstname(), res[i].getLastname(), res[i].getNickname(), res[i].getSex(), res[i].getBirthday(), res[i].getAddress(), res[i].getImgPath(), res[i].getWeight(), res[i].getHeight(), res[i].getApparent(), res[i].getDiseases(), res[i].getMedicine(), res[i].getAllergicMed(), res[i].getAllergicFood(), res[i].getDoctorName(), res[i].getDoctorPhone(), res[i].getHospitalName(), res[i].getCousinName1(), res[i].getCousinPhone1(), res[i].getCousinRelation1(), res[i].getCousinName2(), res[i].getCousinPhone2(), res[i].getCousinRelation2(), res[i].getCousinName3(), res[i].getCousinPhone3(), res[i].getCousinRelation3(), res[i].getAlertType(), color, res[i].getTstart());

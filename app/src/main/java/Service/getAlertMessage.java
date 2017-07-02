@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
@@ -58,7 +57,8 @@ import SQLite.DBAlertType;
 import SQLite.DBPetient;
 import SQLite.DBUser;
 
-import static DataResponse.CheckAlertColor.CheckAlertColor;
+import static DataResponse.CheckAlert.CheckAlertColor;
+import static DataResponse.CheckAlert.CheckAlertSound;
 
 /**
  * Created by Ben on 11/6/2560.
@@ -453,8 +453,9 @@ public class getAlertMessage extends Service {
         String message = fullname + " " + typename;
         String title = "Prefalls Notification";
 
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
+        //Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+ Uri alarmSound  = Uri.parse("android.resource://"
+                    + getApplicationContext().getPackageName() + "/" + CheckAlertSound(type));
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.icon)
                 .setNumber(countalert)
@@ -507,12 +508,9 @@ public class getAlertMessage extends Service {
         broadcastIntent.putExtra("tstart", timestart);
         Log.i(TAG,"TSTARTNA: " + timestart);
         sendBroadcast(broadcastIntent);
-
         String imagepath = dbpetient.getImagepath(pid);
-
         DBAlert dbAlert = new DBAlert(getApplicationContext());
         Log.i(TAG,"UpdateData => "+ dbAlert.updateData(pid,fullname, typename, imagepath, timestart, lat, lng, CheckAlertColor(type)));
-
 
     }
     public void SendBroadCast(String pid, Double lat, Double lng ,String stab , String sym , String spd, String ts){
@@ -527,8 +525,6 @@ public class getAlertMessage extends Service {
         broadcastIntent.putExtra("spd", spd);
         broadcastIntent.putExtra("ts", ts);
         sendBroadcast(broadcastIntent);
-
-
     }
     public static Bitmap getBitmapFromURL(String src) {
         try {

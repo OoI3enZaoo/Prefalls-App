@@ -127,10 +127,7 @@ public class NotificationActivity extends AppCompatActivity {
 
     }
     public void refreshItems() {
-        // Load items
-        // ...
-
-        // Load complete
+        LoadAlert();
         onItemsLoadComplete();
     }
 
@@ -146,6 +143,10 @@ public class NotificationActivity extends AppCompatActivity {
         super.onResume();
         //registerReceiver(mReceiver, mIntentFilter);
         Log.i(TAG, "onReSume()");
+       LoadAlert();
+    }
+
+    private void LoadAlert() {
         mNameUserArray.clear();
         mNameTypeArray.clear();
         mPidArray.clear();
