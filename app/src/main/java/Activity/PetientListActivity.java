@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Vibrator;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -53,6 +55,8 @@ import okhttp3.Response;
 
 import java.lang.reflect.Type;
 
+import static android.view.MotionEvent.ACTION_DOWN;
+
 public class PetientListActivity extends AppCompatActivity {
 
     public static CardViewAdapter mAdapter;
@@ -68,6 +72,10 @@ public class PetientListActivity extends AppCompatActivity {
     public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
     public static final String mBroadcastIntegerAction = "com.truiton.broadcast.integer";
     private ProgressDialog dialog;
+    public static TextView mStab;
+    public static  TextView mSym;
+    public static TextView mTime;
+    public static TextView mStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,48 +103,74 @@ public class PetientListActivity extends AppCompatActivity {
             public void onCardViewTapLong(View view, final int position) {
                 // Toast.makeText(getApplicationContext(), "Tab long", Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "Long Tapped");
+                final String pid = pidArray.get(position);
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(PetientListActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.customdialog, null);
-                Button mDetail = (Button) mView.findViewById(R.id.btnDetail);
-                Button mAlert = (Button) mView.findViewById(R.id.btnAlert);
-                TextView mStab = (TextView) mView.findViewById(R.id.txtStab);
-                TextView mSym = (TextView) mView.findViewById(R.id.txtSym);
-                TextView mTime =(TextView)mView.findViewById(R.id.txtTime);
-                ImageView mPatient = (ImageView)mView.findViewById(R.id.imgPatient);
-                TextView mStatus = (TextView)mView.findViewById(R.id.txtStatus);
-                ImageButton mProfile = (ImageButton)mView.findViewById(R.id.ibProfile);
+                ImageButton mDetail = (ImageButton) mView.findViewById(R.id.btnDetail);
+                ImageButton mAlert = (ImageButton) mView.findViewById(R.id.btnAlert);
+                 mStab = (TextView) mView.findViewById(R.id.txtStab);
+                 mSym = (TextView) mView.findViewById(R.id.txtSym);
+                 mTime = (TextView) mView.findViewById(R.id.txtTime);
+                ImageView mPatient = (ImageView) mView.findViewById(R.id.imgPatient);
+                 mStatus = (TextView) mView.findViewById(R.id.txtStatus);
+                ImageButton mProfile = (ImageButton) mView.findViewById(R.id.ibProfile);
+
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
                 mTime.setText(tstartArray.get(position));
-                DBAlert dbAlert = new DBAlert(getApplicationContext());
-                Cursor res = dbAlert.getDataInTime(pidArray.get(position),tstartArray.get(position));
-                if(res.getCount() == 0){
-                    Log.i(TAG,"res == 0 ");
-                    mStab.setText("-");
-                    mSym.setText("-");
-                }else{
-                    while (res.moveToNext()){
-                        String status = res.getString(2);
-                        String stab = res.getString(8);
-                        String sym = res.getString(9);
-                        String spd = res.getString(10);
-                        Log.i(TAG,"STAB: " + stab);
-                        Log.i(TAG,"SYM: " + sym);
-                        Log.i(TAG,"SPD: " + spd);
-                        mStab.setText(stab);
-                        mSym.setText(sym);
-                        mStatus.setTextColor(Color.RED);
-                        mStatus.setText(status);
+
+
+                DBPetient dbPetient = new DBPetient(getApplicationContext());
+                Cursor res = dbPetient.getAllDataEach(pid);
+                Log.i(TAG,"LENGTH: " +res.getCount());
+                if (res.getCount() == 0) {
+
+                }
+                else{
+                    while (res.moveToNext()) {
+                        String color = res.getString(28);
+                        String stab = res.getString(30);
+                        String sym = res.getString(31);
+                        String typename = res.getString(32);
+                        if(stab.equals("") || sym.equals("") || typename.equals("")){
+                            mStab.setText("--");
+                            mSym.setText("--");
+                            mStatus.setText(statusArray.get(position));
+                        }else {
+                            Log.i(TAG, "Long> stab: " + stab);
+                            Log.i(TAG, "Long> sym: " + sym);
+                            Log.i(TAG, "Long> typename: " + typename);
+                            mStab.setText(stab);
+                            mSym.setText(sym);
+                            mStatus.setText(typename);
+                            mStatus.setTextColor(Color.parseColor(color));
+
+                        }
                     }
                 }
 
+              /* mStab.setText(patientData.getStab(position));
+                mSym.setText(patientData.getSym(position));
+                mStatus.setTextColor(Color.RED);
+                mStatus.setText(patientData.getStatus(position));*/
 
-                mProfile.setOnClickListener(new View.OnClickListener(){
+
+                mProfile.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(getApplicationContext(),ProfileActivity.class);
-                        intent.putExtra("pid",pidArray.get(position));
+                        Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                        intent.putExtra("pid", pid);
                         startActivity(intent);
+                    }
+                });
+                mDetail.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(event.getAction() == ACTION_DOWN){
+                            Vibrator v2 = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            v2.vibrate(50);
+                        }
+                        return false;
                     }
                 });
                 mDetail.setOnClickListener(new View.OnClickListener() {
@@ -150,12 +184,25 @@ public class PetientListActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
+                mAlert.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(event.getAction() == ACTION_DOWN){
+
+                            Vibrator v2 = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            v2.vibrate(50);
+                        }
+
+
+                        return false;
+                    }
+                });
                 mAlert.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
-                        Intent intent = new Intent(getApplicationContext(),NotificationActivity.class);
-                        intent.putExtra("type",pidArray.get(position));
+                        Intent intent = new Intent(getApplicationContext(), NotificationActivity.class);
+                        intent.putExtra("type", pidArray.get(position));
                         startActivity(intent);
                     }
                 });
@@ -372,16 +419,19 @@ public class PetientListActivity extends AppCompatActivity {
                     int type = Integer.parseInt(res[i].getAlertType());
                     String color = CheckAlert.CheckAlertColor(type);
                     Log.i(TAG, "firstname" + res[i].getFirstname());
+                    DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
+                    String alertTypeName = dbAlertType.getAlertTypeName(type);
+
                     DBPetient dbPetient = new DBPetient(getApplicationContext());
-                    dbPetient.insertData(res[i].getSSSN(), res[i].getFirstname(), res[i].getLastname(), res[i].getNickname(), res[i].getSex(), res[i].getBirthday(), res[i].getAddress(), res[i].getImgPath(), res[i].getWeight(), res[i].getHeight(), res[i].getApparent(), res[i].getDiseases(), res[i].getMedicine(), res[i].getAllergicMed(), res[i].getAllergicFood(), res[i].getDoctorName(), res[i].getDoctorPhone(), res[i].getHospitalName(), res[i].getCousinName1(), res[i].getCousinPhone1(), res[i].getCousinRelation1(), res[i].getCousinName2(), res[i].getCousinPhone2(), res[i].getCousinRelation2(), res[i].getCousinName3(), res[i].getCousinPhone3(), res[i].getCousinRelation3(), res[i].getAlertType(), color, res[i].getTstart());
+                    dbPetient.insertData(res[i].getSSSN(), res[i].getFirstname(), res[i].getLastname(), res[i].getNickname(), res[i].getSex(), res[i].getBirthday(), res[i].getAddress(), res[i].getImgPath(), res[i].getWeight(), res[i].getHeight(), res[i].getApparent(), res[i].getDiseases(), res[i].getMedicine(), res[i].getAllergicMed(), res[i].getAllergicFood(), res[i].getDoctorName(), res[i].getDoctorPhone(), res[i].getHospitalName(), res[i].getCousinName1(), res[i].getCousinPhone1(), res[i].getCousinRelation1(), res[i].getCousinName2(), res[i].getCousinPhone2(), res[i].getCousinRelation2(), res[i].getCousinName3(), res[i].getCousinPhone3(), res[i].getCousinRelation3(), res[i].getAlertType(), color, res[i].getTstart(),res[i].getStab(),res[i].getSym(),res[i].getSpd(),res[i].getLat(),res[i].getLng(),alertTypeName);
                     nameArray.add(res[i].getFirstname() + " " + res[i].getLastname() + "(" + dbPetient.getNickName(res[i].getSSSN()) + ")");
                     imgArray.add(res[i].getImgPath());
                     pidArray.add(res[i].getSSSN());
-                    DBAlertType dbAlertType = new DBAlertType(getApplicationContext());
-                    String alertTypeName = dbAlertType.getAlertTypeName(type);
                     statusArray.add(alertTypeName);
                     colorArray.add(color);
                     tstartArray.add(res[i].getTstart());
+
+
 
                 }
 
@@ -441,14 +491,8 @@ public class PetientListActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             stopDialog();
-
-
         }
-
-
     }
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -471,6 +515,10 @@ public class PetientListActivity extends AppCompatActivity {
             dbPetient.updateColorFromSSSN(color, pid);
             dbPetient.updateTypeFromSSSN(type, pid);
             dbPetient.updateTstartFromSSSN(tstart, pid);
+            mTime.setText(tstart);
+            mStatus.setText(typename);
+            mStatus.setTextColor(Color.parseColor(color));
+
             for (int i = 0; i < count; i++) {
                /* View view = recyclerView.getChildAt(i);*/
                 if (pid.equals(pidArray.get(i))) {
@@ -479,6 +527,29 @@ public class PetientListActivity extends AppCompatActivity {
                     statusArray.set(i, typename);
                     tstartArray.set(i, tstart);
                     mAdapter.notifyDataSetChanged();
+                    DBAlert dbAlert = new DBAlert(getApplicationContext());
+                    Cursor res = dbAlert.getDataInTime(pidArray.get(i), tstartArray.get(i));
+                    if (res.getCount() == 0) {
+                        Log.i(TAG, "res == 0 ");
+
+                    } else {
+                        while (res.moveToNext()) {
+                            String status = res.getString(2);
+                            String stab = res.getString(8);
+                            String sym = res.getString(9);
+                            String spd = res.getString(10);
+                            mStab.setText(stab);
+                            mSym.setText(sym);
+                            Log.i(TAG, "STAB: " + stab);
+                            Log.i(TAG, "SYM: " + sym);
+                            Log.i(TAG, "SPD: " + spd);
+                            dbPetient.updateStabFromSSSN(stab, pid);
+                            dbPetient.updateSymFromSSSN(sym, pid);
+                            dbPetient.updateTypenameFromSSSN(status, pid);
+
+                        }
+                    }
+
 
                     break;
                 }
@@ -563,6 +634,8 @@ public class PetientListActivity extends AppCompatActivity {
     public void onBackPressed() {
         // Do Here what ever you want do on back press;
     }
+
+
 }
 
 

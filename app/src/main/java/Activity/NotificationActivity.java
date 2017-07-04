@@ -38,8 +38,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class NotificationActivity extends AppCompatActivity {
 
     private IntentFilter mIntentFilter;
-    public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
-    public static final String mBroadcastIntegerAction = "com.truiton.broadcast.integer";
+    /*public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
+    public static final String mBroadcastIntegerAction = "com.truiton.broadcast.integer";*/
     public String TAG = "NotificationActivity";
     SwipeRefreshLayout mSwipeRefreshLayout;
     ArrayList<String> mPidArray = new ArrayList<>();
@@ -72,9 +72,9 @@ public class NotificationActivity extends AppCompatActivity {
             PID = type;
           //  Toast.makeText(getApplicationContext(), "each", Toast.LENGTH_SHORT).show();
         }
-        mIntentFilter = new IntentFilter();
+        /*mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(mBroadcastStringAction);
-        mIntentFilter.addAction(mBroadcastIntegerAction);
+        mIntentFilter.addAction(mBroadcastIntegerAction);*/
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
             @Override
             public void onCardViewTap(View view, int position) {
@@ -169,6 +169,9 @@ public class NotificationActivity extends AppCompatActivity {
 
                     mPidArray.add(res.getString(0));
                     mNameUserArray.add(res.getString(1));
+                    Log.i(TAG, "mNameUserArray: " + res.getString(1));
+                    Log.i(TAG, "mPidArray: " + res.getString(0));
+                    Log.i(TAG, "mImagePathArray: " + res.getString(3));
                     mNameTypeArray.add(res.getString(2));
                     mImagePathArray.add(res.getString(3));
                     mTimeArray.add(res.getString(4));
@@ -200,6 +203,7 @@ public class NotificationActivity extends AppCompatActivity {
         }
         mAdapter.notifyDataSetChanged();
     }
+/*
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
@@ -221,6 +225,7 @@ public class NotificationActivity extends AppCompatActivity {
 
         }
     };
+*/
 
     @Override
     protected void onPause() {

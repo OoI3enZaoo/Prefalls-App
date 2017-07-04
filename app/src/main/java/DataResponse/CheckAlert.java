@@ -9,8 +9,6 @@ import Activity.R;
 public class CheckAlert {
     private  static String color = "#CCFFBB";
 
-
-
     public static String CheckAlertColor(int type){
         if(type == 3 || type == 8){color = "#FFCC00";}
         else if(type == 7 || type == 4 || type == 9){color = "#B33A3A";}

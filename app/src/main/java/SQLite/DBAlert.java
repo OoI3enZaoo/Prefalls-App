@@ -99,7 +99,7 @@ public class DBAlert extends SQLiteOpenHelper {
 
     public Cursor getAllDataEach(String pid,int size) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit " +size, null);
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' AND "+CONTACTS_COLUMN_NAME+" not null ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit " +size, null);
         return res;
         /*
             how to use
@@ -114,7 +114,7 @@ public class DBAlert extends SQLiteOpenHelper {
     }
     public Cursor getAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit 10", null);
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + "  WHERE "+CONTACTS_COLUMN_NAME+" not null ORDER BY " + CONTACTS_COLUMN_TIME + " DESC limit 10", null);
         return res;
 
         /*
@@ -130,7 +130,7 @@ public class DBAlert extends SQLiteOpenHelper {
     }
     public Cursor getDataInTime(String pid , String time) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' AND "+ CONTACTS_COLUMN_TIME +" = '" + time + "' limit 1" , null);
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_PID + " = '" + pid + "' AND "+ CONTACTS_COLUMN_TIME +" = '" + time + "'  AND "+CONTACTS_COLUMN_NAME+" not null limit 1" , null);
         return res;
     }
 

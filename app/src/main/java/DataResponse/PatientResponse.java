@@ -37,6 +37,11 @@ public class PatientResponse {
      * cousinRelation3 : -
      * alertType : 0
      * tstart : N/D
+     * stab
+     * sym
+     * spd
+     * lat
+     * lng
      */
 
     private String SSSN;
@@ -68,6 +73,11 @@ public class PatientResponse {
     private String cousinRelation3;
     private String alertType;
     private String tstart;
+    private String spd;
+    private String lat;
+    private String lng;
+    private String stab;
+    private String sym;
 
     public String getSSSN() {
         return SSSN;
@@ -292,12 +302,42 @@ public class PatientResponse {
     public void setAlertType(String alertType) {
         this.alertType = alertType;
     }
-
     public String getTstart() {
         return tstart;
     }
-
     public void setTstart(String tstart) {
         this.tstart = tstart;
     }
+
+    public String getLat(){
+        return lng;
+    }
+    public void setLat(String lat){
+        this.lat = lat;
+    }
+    public String getLng(){
+        return lng;
+    }
+    public void setLng(String lng){
+        this.lng = lng;
+    }
+    public String getStab(){
+        return stab;
+    }
+    public void setStab(String stab){
+        this.stab = stab;
+    }
+    public String getSym(){
+        return sym;
+    }
+    public void setSym(String sym){
+        this.sym = sym;
+    }
+    public String getSpd(){
+        return spd;
+    }
+    public void setSpd(String spd){
+        this.spd = spd;
+    }
+
 }

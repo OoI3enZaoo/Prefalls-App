@@ -43,11 +43,18 @@ public class DBPetient extends SQLiteOpenHelper {
     public static final String CONTACTS_COLUMN_cousinRelation3 = "cousinRelation3";
     public static final String CONTACTS_COLUMN_TYPE = "type";
     public static final String CONTACTS_COLUMN_COLOR = "color";
-    public static final String CONTACTS_COLUMN_TSTART = "tstart";
+    public static final String CONTACTS_COLUMN_TSTART = "tstart";//29
+    public static final String CONTACTS_COLUMN_STAB = "stab";
+    public static final String CONTACTS_COLUMN_SYM = "sym";
+    public static final String CONTACTS_COLUMN_SPD = "spd";
+    public static final String CONTACTS_COLUMN_LAT = "lat";
+    public static final String CONTACTS_COLUMN_LNG = "lng";
+    public static final String CONTACTS_COLUMN_TYPENAME = "typename";
 
     public DBPetient(Context context) {
         super(context, DATABASE_NAME, null, 1);
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
@@ -80,13 +87,20 @@ public class DBPetient extends SQLiteOpenHelper {
                         CONTACTS_COLUMN_cousinName3 + " text," +
                         CONTACTS_COLUMN_cousinPhone3 + " text," +
                         CONTACTS_COLUMN_cousinRelation3 + " text, " +
-                        CONTACTS_COLUMN_TYPE + " text,"+
-                        CONTACTS_COLUMN_COLOR + " text, "+
-                        CONTACTS_COLUMN_TSTART + " text "+
+                        CONTACTS_COLUMN_TYPE + " text," +
+                        CONTACTS_COLUMN_COLOR + " text, " +
+                        CONTACTS_COLUMN_TSTART + " text, " +
+                        CONTACTS_COLUMN_STAB + " text, " +
+                        CONTACTS_COLUMN_SYM + " text, " +
+                        CONTACTS_COLUMN_TYPENAME + " text, " +
+                        CONTACTS_COLUMN_SPD + " text, " +
+                        CONTACTS_COLUMN_LAT + " text, " +
+                        CONTACTS_COLUMN_LNG + " text " +
 
                         ")"
         );
     }
+
     public void drop() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(CONTACTS_TABLE_NAME, null, null);
@@ -99,8 +113,7 @@ public class DBPetient extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3,String type, String color,String tstart)
-    {
+    public boolean insertData(String SSSN, String firstname, String lastname, String nickname, String sex, String birthday, String address, String imgPath, String weight, String height, String apparent, String diseases, String medicine, String AllergicMed, String AllergicFood, String doctorName, String doctorPhone, String hospitalName, String cousinName1, String cousinPhone1, String cousinRelation1, String cousinName2, String cousinPhone2, String cousinRelation2, String cousinName3, String cousinPhone3, String cousinRelation3, String type, String color, String tstart,String stab , String sym , String spd, String lat , String lng,String alertTypeName) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(CONTACTS_COLUMN_SSSN, SSSN);//0
@@ -119,7 +132,7 @@ public class DBPetient extends SQLiteOpenHelper {
         contentValues.put(CONTACTS_COLUMN_AllergicMed, AllergicMed);
         contentValues.put(CONTACTS_COLUMN_AllergicFood, AllergicFood);
         contentValues.put(CONTACTS_COLUMN_doctorName, doctorName);//15
-        contentValues.put(CONTACTS_COLUMN_doctorPhone, doctorPhone );
+        contentValues.put(CONTACTS_COLUMN_doctorPhone, doctorPhone);
         contentValues.put(CONTACTS_COLUMN_hospitalName, hospitalName);
         contentValues.put(CONTACTS_COLUMN_cousinName1, cousinName1);
         contentValues.put(CONTACTS_COLUMN_cousinPhone1, cousinPhone1);
@@ -130,13 +143,20 @@ public class DBPetient extends SQLiteOpenHelper {
         contentValues.put(CONTACTS_COLUMN_cousinName3, cousinName3);
         contentValues.put(CONTACTS_COLUMN_cousinPhone3, cousinPhone3);//25
         contentValues.put(CONTACTS_COLUMN_cousinRelation3, cousinRelation3);//26
-        contentValues.put(CONTACTS_COLUMN_TYPE,type);
-        contentValues.put(CONTACTS_COLUMN_COLOR,color);
-        contentValues.put(CONTACTS_COLUMN_TSTART,tstart);
-        db.insert(CONTACTS_TABLE_NAME,null,contentValues);//30
+        contentValues.put(CONTACTS_COLUMN_TYPE, type);
+        contentValues.put(CONTACTS_COLUMN_COLOR, color);
+        contentValues.put(CONTACTS_COLUMN_TSTART, tstart);
+        contentValues.put(CONTACTS_COLUMN_STAB, stab);
+        contentValues.put(CONTACTS_COLUMN_SYM, sym);
+        contentValues.put(CONTACTS_COLUMN_SPD, spd);
+        contentValues.put(CONTACTS_COLUMN_LAT, lat);
+        contentValues.put(CONTACTS_COLUMN_LNG, lng);
+        contentValues.put(CONTACTS_COLUMN_TYPENAME, alertTypeName);
+        db.insert(CONTACTS_TABLE_NAME, null, contentValues);//30
         db.close();
         return true;
     }
+
     public Cursor getAllData() {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME, null);
@@ -152,9 +172,10 @@ public class DBPetient extends SQLiteOpenHelper {
                     }
          */
     }
+
     public Cursor getAllDataEach(String pid) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN + " = " + "'"+pid+"'", null);
+        Cursor res = db.rawQuery("select * from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_SSSN + " = " + "'" + pid + "'", null);
         return res;
         /*
             how to use
@@ -173,7 +194,7 @@ public class DBPetient extends SQLiteOpenHelper {
         String firstname = null;
         String lastname = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_firstname + " , "+CONTACTS_COLUMN_lastname+" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_firstname + " , " + CONTACTS_COLUMN_lastname + " from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_SSSN + "='" + pid + "'", null);
 
         res.moveToFirst();
 
@@ -189,7 +210,7 @@ public class DBPetient extends SQLiteOpenHelper {
     public String getNickName(String pid) {
         String nickname = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_nickname +" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_nickname + " from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_SSSN + "='" + pid + "'", null);
 
         res.moveToFirst();
 
@@ -199,10 +220,11 @@ public class DBPetient extends SQLiteOpenHelper {
         }
         return nickname;
     }
+
     public String getImagepath(String pid) {
         String imgpath = null;
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_imgPath +" from " + CONTACTS_TABLE_NAME +" WHERE " + CONTACTS_COLUMN_SSSN+"='"+pid+"'", null);
+        Cursor res = db.rawQuery("select " + CONTACTS_COLUMN_imgPath + " from " + CONTACTS_TABLE_NAME + " WHERE " + CONTACTS_COLUMN_SSSN + "='" + pid + "'", null);
 
         res.moveToFirst();
 
@@ -214,24 +236,58 @@ public class DBPetient extends SQLiteOpenHelper {
         return imgpath;
     }
 
-    public void updateColorFromSSSN(String color, String sssn){
+    public void updateColorFromSSSN(String color, String sssn) {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_COLOR+" = '"+color+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_COLOR + " = '" + color + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
         db.execSQL(strSQL);
 
     }
-    public void updateTypeFromSSSN(int type , String sssn){
+
+    public void updateTypeFromSSSN(int type, String sssn) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_TYPE+" = '"+type+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
-        db.execSQL(strSQL);
-    }
-    public void updateTstartFromSSSN(String tstart , String sssn){
-        SQLiteDatabase db = this.getWritableDatabase();
-        String strSQL = "UPDATE "+CONTACTS_TABLE_NAME+" SET "+CONTACTS_COLUMN_TSTART+" = '"+tstart+"' WHERE "+CONTACTS_COLUMN_SSSN+" = '"+ sssn+"'";
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_TYPE + " = '" + type + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
         db.execSQL(strSQL);
     }
 
+    public void updateTstartFromSSSN(String tstart, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_TSTART + " = '" + tstart + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
 
 
+    public void updateSymFromSSSN(String sym, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_SYM + " = '" + sym + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+
+    }
+
+    public void updateStabFromSSSN(String stab, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_STAB + " = '" + stab + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
+    public void updateTypenameFromSSSN(String status, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_TYPENAME + " = '" + status + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
+    public void updateSpdFromSSSN(String spd, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_SPD + " = '" + spd + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
+
+    public void updateLatFromSSSN(String lat, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_LAT + " = '" + lat + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
+    public void updateLngFromSSSN(String lng, String sssn) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String strSQL = "UPDATE " + CONTACTS_TABLE_NAME + " SET " + CONTACTS_COLUMN_LNG + " = '" + lng + "' WHERE " + CONTACTS_COLUMN_SSSN + " = '" + sssn + "'";
+        db.execSQL(strSQL);
+    }
 }
