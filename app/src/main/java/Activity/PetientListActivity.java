@@ -76,6 +76,7 @@ public class PetientListActivity extends AppCompatActivity {
     public static  TextView mSym;
     public static TextView mTime;
     public static TextView mStatus;
+    public static View mView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +87,11 @@ public class PetientListActivity extends AppCompatActivity {
         mIntentFilter.addAction(mBroadcastIntegerAction);
         dialog = new ProgressDialog(PetientListActivity.this);
         //getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Patient List </font>"));
+        mView = getLayoutInflater().inflate(R.layout.customdialog, null);
+        mStab = (TextView) mView.findViewById(R.id.txtStab);
+        mSym = (TextView) mView.findViewById(R.id.txtSym);
+        mTime = (TextView) mView.findViewById(R.id.txtTime);
+        mStatus = (TextView) mView.findViewById(R.id.txtStatus);
 
         startDialog();
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
@@ -105,14 +111,11 @@ public class PetientListActivity extends AppCompatActivity {
                 Log.i(TAG, "Long Tapped");
                 final String pid = pidArray.get(position);
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(PetientListActivity.this);
-                View mView = getLayoutInflater().inflate(R.layout.customdialog, null);
                 ImageButton mDetail = (ImageButton) mView.findViewById(R.id.btnDetail);
                 ImageButton mAlert = (ImageButton) mView.findViewById(R.id.btnAlert);
-                 mStab = (TextView) mView.findViewById(R.id.txtStab);
-                 mSym = (TextView) mView.findViewById(R.id.txtSym);
-                 mTime = (TextView) mView.findViewById(R.id.txtTime);
+
                 ImageView mPatient = (ImageView) mView.findViewById(R.id.imgPatient);
-                 mStatus = (TextView) mView.findViewById(R.id.txtStatus);
+
                 ImageButton mProfile = (ImageButton) mView.findViewById(R.id.ibProfile);
 
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
@@ -516,7 +519,7 @@ public class PetientListActivity extends AppCompatActivity {
             dbPetient.updateTypeFromSSSN(type, pid);
             dbPetient.updateTstartFromSSSN(tstart, pid);
             mTime.setText(tstart);
-            mStatus.setText(typename);
+                mStatus.setText(typename);
             mStatus.setTextColor(Color.parseColor(color));
 
             for (int i = 0; i < count; i++) {
