@@ -55,7 +55,15 @@ import okhttp3.Response;
 
 import java.lang.reflect.Type;
 
+import static android.support.v4.view.MotionEventCompat.ACTION_POINTER_UP;
+import static android.view.MotionEvent.ACTION_CANCEL;
 import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_HOVER_ENTER;
+import static android.view.MotionEvent.ACTION_HOVER_EXIT;
+import static android.view.MotionEvent.ACTION_HOVER_MOVE;
+import static android.view.MotionEvent.ACTION_MASK;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 
 public class PetientListActivity extends AppCompatActivity {
 
@@ -71,13 +79,17 @@ public class PetientListActivity extends AppCompatActivity {
     private IntentFilter mIntentFilter;
     public static final String mBroadcastStringAction = "com.truiton.broadcast.string";
     public static final String mBroadcastIntegerAction = "com.truiton.broadcast.integer";
-    private ProgressDialog dialog;
+    //private ProgressDialog dialog;
     public static TextView mStab;
     public static  TextView mSym;
     public static TextView mTime;
     public static TextView mStatus;
     public static View mView;
-
+    public static AlertDialog dialog;
+    public static ImageButton mDetail;
+    public static ImageButton mAlert;
+    public static ImageView mPatient;
+    public static ImageButton mProfile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,15 +97,19 @@ public class PetientListActivity extends AppCompatActivity {
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(mBroadcastStringAction);
         mIntentFilter.addAction(mBroadcastIntegerAction);
-        dialog = new ProgressDialog(PetientListActivity.this);
+        //dialog = new ProgressDialog(PetientListActivity.this);
         //getSupportActionBar().setTitle(Html.fromHtml("<font color='#000000'>Patient List </font>"));
         mView = getLayoutInflater().inflate(R.layout.customdialog, null);
         mStab = (TextView) mView.findViewById(R.id.txtStab);
         mSym = (TextView) mView.findViewById(R.id.txtSym);
         mTime = (TextView) mView.findViewById(R.id.txtTime);
         mStatus = (TextView) mView.findViewById(R.id.txtStatus);
+        mDetail = (ImageButton) mView.findViewById(R.id.btnDetail);
+        mAlert = (ImageButton) mView.findViewById(R.id.btnAlert);
+        mPatient = (ImageView) mView.findViewById(R.id.imgPatient);
+        mProfile = (ImageButton) mView.findViewById(R.id.ibProfile);
 
-        startDialog();
+        //startDialog();
         OnItemTouchListener itemTouchListener = new OnItemTouchListener() {
             @Override
             public void onCardViewTap(View view, int position) {
@@ -105,18 +121,23 @@ public class PetientListActivity extends AppCompatActivity {
                 startActivity(intent);
             }
 
+
             @Override
             public void onCardViewTapLong(View view, final int position) {
                 // Toast.makeText(getApplicationContext(), "Tab long", Toast.LENGTH_SHORT).show();
                 Log.i(TAG, "Long Tapped");
                 final String pid = pidArray.get(position);
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(PetientListActivity.this);
-                ImageButton mDetail = (ImageButton) mView.findViewById(R.id.btnDetail);
-                ImageButton mAlert = (ImageButton) mView.findViewById(R.id.btnAlert);
+                mView = getLayoutInflater().inflate(R.layout.customdialog, null);
+                mStab = (TextView) mView.findViewById(R.id.txtStab);
+                mSym = (TextView) mView.findViewById(R.id.txtSym);
+                mTime = (TextView) mView.findViewById(R.id.txtTime);
+                mStatus = (TextView) mView.findViewById(R.id.txtStatus);
+                mDetail = (ImageButton) mView.findViewById(R.id.btnDetail);
+                mAlert = (ImageButton) mView.findViewById(R.id.btnAlert);
+                mPatient = (ImageView) mView.findViewById(R.id.imgPatient);
+                mProfile = (ImageButton) mView.findViewById(R.id.ibProfile);
 
-                ImageView mPatient = (ImageView) mView.findViewById(R.id.imgPatient);
-
-                ImageButton mProfile = (ImageButton) mView.findViewById(R.id.ibProfile);
 
                 Picasso.with(getApplicationContext()).load("http://sysnet.utcc.ac.th/prefalls/images/patients/" + imgArray.get(position)).into(mPatient);
                 mTime.setText(tstartArray.get(position));
@@ -166,9 +187,23 @@ public class PetientListActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 });
-                mDetail.setOnTouchListener(new View.OnTouchListener() {
+                mProfile.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
+                        if(event.getAction() == ACTION_DOWN){
+
+                            Vibrator v2 = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+                            v2.vibrate(50);
+                        }
+                        return false;
+                    }
+                });
+
+                mDetail.setOnTouchListener(new View.OnTouchListener() {
+
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        Log.i(TAG,"TestTouchDetail");
                         if(event.getAction() == ACTION_DOWN){
                             Vibrator v2 = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
                             v2.vibrate(50);
@@ -242,8 +277,9 @@ public class PetientListActivity extends AppCompatActivity {
 //                });
 
                 mBuilder.setView(mView);
-                final AlertDialog dialog = mBuilder.create();
+               dialog = mBuilder.create();
                 dialog.show();
+
 
             }
 
@@ -296,7 +332,7 @@ public class PetientListActivity extends AppCompatActivity {
 
                 colorArray.add(color);
                 tstartArray.add(tstart);
-                stopDialog();
+                ///stopDialog();
             }
             Log.i(TAG, "get from SQlite");
         }
@@ -310,6 +346,7 @@ public class PetientListActivity extends AppCompatActivity {
         void onCardViewTap(View view, int position);
 
         void onCardViewTapLong(View view, int position);
+
 
         void onButton1Click(View view, int position);
 
@@ -449,7 +486,7 @@ public class PetientListActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mAdapter.notifyDataSetChanged();
-            stopDialog();
+            //stopDialog();
 
 
         }
@@ -493,7 +530,7 @@ public class PetientListActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            stopDialog();
+            //stopDialog();
         }
     }
     @Override
@@ -569,7 +606,7 @@ public class PetientListActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    public void startDialog() {
+  /*  public void startDialog() {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setMessage("Loading. Please wait...");
         dialog.setIndeterminate(true);
@@ -579,7 +616,7 @@ public class PetientListActivity extends AppCompatActivity {
 
     public void stopDialog() {
         dialog.dismiss();
-    }
+    }*/
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

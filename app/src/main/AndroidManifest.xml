@@ -51,6 +51,14 @@
             android:name=".SettingActivity"
             android:parentActivityName=".PetientListActivity" />
         <activity android:name=".ProfileActivity" android:theme="@style/AppTheme.NoActionBar"></activity>
+        <!-- Declaring broadcast receiver for BOOT_COMPLETED event. -->
+        <receiver android:name="Service.ReceiverStartService" android:enabled="true" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
+    <!-- Adding the permission -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 </manifest>

@@ -7,9 +7,9 @@ android {
         applicationId "com.ben.prefalls"
         minSdkVersion 18
         targetSdkVersion 23
-        versionCode 2
+        versionCode 3
         multiDexEnabled = true
-        versionName "2.1"
+        versionName "2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
